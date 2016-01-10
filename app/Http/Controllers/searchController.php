@@ -65,12 +65,26 @@ class searchController extends Controller
     public function display(Request $request)
     {
       $tweets="";
+      $tweetsinfo="";
       $trends="Nothing until now";
       $keyword = $request->input('keyword');
+      $gender = $request->input('gender');
+      $datefrom = $request->input('datefrom');
+      $dateto = $request->input('dateto');
+      $location = $request->input('location');
+      $social1 = $request->input('social1');
+      $social2 = $request->input('social2');
+      $website1 = $request->input('website1');
+      $website2 = $request->input('website2');
+      $trends1 = $request->input('trends1');
+
+      if($keyword!=NULL && $social1!=NULL)
+      {
       $tweets=$this->twittersearch($keyword);
       $tweetsinfo=$this->tweetsinf($tweets);
+      }
       //$trends=$this->gtrendsdisplay($keyword);
-      $data=array('keyword'=>$keyword,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends);
+      $data=array('keyword'=>$keyword,'gender'=>$gender, 'datefrom'=>$datefrom,'dateto'=>$dateto, 'location'=>$location,'social1'=>$social1,'social2'=>$social2,'website1'=>$website1,'website2'=>$website2,'trends1'=>$trends1,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends,);
       return view('results',$data);
     }
 
