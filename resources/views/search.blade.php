@@ -15,34 +15,34 @@ Social Search Engine
     <form class="navbar-form navbar-left" role="search" method="get" action="search">
       <div class="form-group">
         <h3>Search Keyword</h3>
-        <input type="text" name="keyword" class="form-control" placeholder="">
+        <input type="text" name="keyword" class="form-control" value="{{$keyword}}">
       </br>
       <h4>Filters:</h4>
         <div class="well col-md-12" style="color:black;">
           <h5>Social Media:</h5>
-          <input type="checkbox" name="website" value="http://www.twitter.com"><label>&nbsp;Twitter&nbsp;</label>
+          <input type="checkbox" name="social1" value="http://www.twitter.com" @if($social1!=NULL) checked @endif><label>&nbsp;Twitter&nbsp;</label>
           </br>
-          <input type="checkbox" name="website" value="http://www.facebook.com"><label>&nbsp;Facebook&nbsp;</label>
+          <input type="checkbox" name="social2" value="http://www.facebook.com" @if($social2!=NULL) checked @endif><label>&nbsp;Facebook&nbsp;</label>
           </br>
           <select class="form-control" name="gender">
-            <option value="none">Gender...</option>
+            <option value="none">...</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
           </select>
           </br>
-          <input type="text" name="date-from" class="form-control" placeholder="From (dd/mm/yy)">
+          <input type="text" name="datefrom" class="form-control" placeholder="From (dd/mm/yy)" @if($datefrom!=NULL) value={{$datefrom}} @endif>
           </br>
-          <input type="text" name="date-to" class="form-control" placeholder="To (dd/mm/yy)">
+          <input type="text" name="dateto" class="form-control" placeholder="To (dd/mm/yy)" @if($dateto!=NULL) value={{$dateto}} @endif>
           </br>
-          <input type="text" name="location" class="form-control" placeholder="Select Location">
+          <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif>
           </br>
           <h5>Trending Portals</h5>
-          <input type="checkbox" name="website" value="http://www.zastone.ba" checked><label>&nbsp; Zastone.ba&nbsp;</label>
+          <input type="checkbox" name="website1" value="http://www.zastone.ba" @if($website1!=NULL) checked @endif><label>&nbsp; Zastone.ba&nbsp;</label>
           </br>
-          <input type="checkbox" name="website" value="http://point.zastone.ba" checked><label>&nbsp; Point.zastone.ba&nbsp;</label>
+          <input type="checkbox" name="website2" value="http://point.zastone.ba" @if($website2!=NULL) checked @endif><label>&nbsp; Point.zastone.ba&nbsp;</label>
           </br>
           <h5>Search Engines</h5>
-          <input type="checkbox" name="website" value="googletrends" checked><label>&nbsp; Google Trends&nbsp;</label>
+          <input type="checkbox" name="trends1" value="http://trends.google.com" @if($trends1!=NULL) checked @endif><label>&nbsp; Google Trends&nbsp;</label>
           <hr style="border-top:1px solid #972002;">
           <button type="submit" class="btn btn-success">Apply Criteria</button>
         </div>
