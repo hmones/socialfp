@@ -1,7 +1,7 @@
 @extends('default')
 
 @section('title')
-Social Search Engine
+Social Footprint
 @stop
 
 @section('content')
@@ -20,19 +20,19 @@ Social Search Engine
         <div class="row">
           <div class="col-md-4">
             <h5> Social Media: </h5>
-            <input  type="checkbox" name="website" value="http://www.twitter.com"><label>&nbsp;Twitter&nbsp;</label>
+            <input type="checkbox" name="social1" value="http://www.twitter.com" ><label>&nbsp;Twitter&nbsp;</label>
             <br>
-            <input  type="checkbox" name="website" value="http://www.facebook.com"><label>&nbsp;Facebook&nbsp;</label>
+            <input type="checkbox" name="social2" value="http://www.facebook.com" ><label>&nbsp;Facebook&nbsp;</label>
           </div>
           <div class="col-md-4">
             <h5> Trending Portals </h5>
-            <input type="checkbox" name="website" value="http://www.zastone.ba" checked><label>&nbsp; Zastone&nbsp;</label>
+            <input type="checkbox" name="website1" value="http://www.zastone.ba" ><label>&nbsp; Zastone&nbsp;</label>
             <br>
-            <input type="checkbox" name="website" value="http://point.zastone.ba" checked><label>&nbsp; Point&nbsp;</label>
+            <input type="checkbox" name="website2" value="http://point.zastone.ba" ><label>&nbsp; Point&nbsp;</label>
           </div>
           <div class="col-md-4">
             <h5> Search Engines </h5>
-            <input type="checkbox" name="website" value="http://trends.google.com" checked><label>&nbsp; GTrends&nbsp;</label>
+            <input type="checkbox" name="trends1" value="http://trends.google.com" ><label>&nbsp; GTrends&nbsp;</label>
           </div>
         </div>
       </form>
