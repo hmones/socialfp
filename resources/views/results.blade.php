@@ -9,7 +9,7 @@ Social Search Engine
 @stop
 
 @section('googletrends')
-@if(TRUE)
+@if($trends1==NULL)
   <h2> Please enter a keyword to search ... </h2>
 @else
 <div style="display:block;margin-left: 20%;">
