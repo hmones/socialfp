@@ -5,7 +5,7 @@ Social Search Engine
 @stop
 
 @section('content')
-@if (count($errors) > 0)
+{{--@if (count($errors) > 0)
     <div style="margin-top:50px;" class="alert alert-danger">
         <ul>
             @foreach ($errors->all() as $error)
@@ -13,7 +13,7 @@ Social Search Engine
             @endforeach
         </ul>
     </div>
-@endif
+@endif--}}
 <div class="row" style="margin-top:50px;margin-left:10px;">
   <!--
   SEARCH FILTER SECTION
