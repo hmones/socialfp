@@ -5,6 +5,15 @@ Social Search Engine
 @stop
 
 @section('content')
+@if (count($errors) > 0)
+    <div style="margin-top:50px;" class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 <div class="row" style="margin-top:50px;margin-left:10px;">
   <!--
   SEARCH FILTER SECTION
@@ -24,17 +33,17 @@ Social Search Engine
           </br>
           <input type="checkbox" name="social2" value="http://www.facebook.com" @if($social2!=NULL) checked @endif><label>&nbsp;Facebook&nbsp;</label>
           </br>
-          <select class="form-control" name="gender">
-            <option value="none">...</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+          <select class="form-control" name="searchtype">
+            <option value="recent">Recent results</option>
+            <option value="popular">Popular results</option>
+            <option value="mixed">Mixed results</option>
           </select>
           </br>
-          <input type="text" name="datefrom" class="form-control" placeholder="From (dd/mm/yy)" @if($datefrom!=NULL) value={{$datefrom}} @endif>
+          <input type="text" name="datefrom" class="form-control" placeholder="From (yyyy/mm/dd)" @if($datefrom!=NULL) value={{$datefrom}} @endif>
           </br>
-          <input type="text" name="dateto" class="form-control" placeholder="To (dd/mm/yy)" @if($dateto!=NULL) value={{$dateto}} @endif>
+          <input type="text" name="dateto" class="form-control" placeholder="To (yyyy/mm/dd)" @if($dateto!=NULL) value={{$dateto}} @endif>
           </br>
-          <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif>
+            <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif>
           </br>
           <h5>Trending Portals</h5>
           <input type="checkbox" name="website1" value="http://www.zastone.ba" @if($website1!=NULL) checked @endif><label>&nbsp; Zastone.ba&nbsp;</label>
@@ -70,6 +79,8 @@ Social Search Engine
       </ul>
 
       <!-- Tab panes -->
+
+
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="socialmedia">
           @yield('socialmedia')
