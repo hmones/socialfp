@@ -95,10 +95,10 @@ class searchController extends Controller
 
     public function display(Request $request)
     {
-      $this->validate($request, [
-        'datefrom' => 'date_format:"Y-m-d"',
-        'dateto' => 'date_format:"Y-m-d"|after:datefrom',
-      ]);
+      //$this->validate($request, [
+        //'datefrom' => 'date_format:"Y-m-d"',
+        //'dateto' => 'date_format:"Y-m-d"|after:datefrom',
+      //]);
       $tweets="";
       $tweetsinfo="";
       $trends="Nothing until now";
