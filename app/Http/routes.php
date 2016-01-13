@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('index');
 });
 
-Route::get('search', 'searchController@display');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -29,5 +29,5 @@ Route::get('search', 'searchController@display');
 */
 
 Route::group(['middleware' => ['web']], function () {
-    //
+    Route::get('search', 'searchController@display');
 });
