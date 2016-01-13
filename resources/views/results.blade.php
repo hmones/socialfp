@@ -1,11 +1,12 @@
 @extends('search')
 
 @section('title')
-Social Search Engine
+SocialFootprint
 @stop
 
 @section('trendingportals')
 <h2> Please enter a keyword to search ...</h2>
+<h2>{{ $locationgeo }}</h2>
 @stop
 
 @section('googletrends')
@@ -38,6 +39,7 @@ Social Search Engine
 </ul>
 </div>
 <h1 style="text-align:center;"> Statuses </h1>
+{{--<h3>{{$tweets->search_metadata->refresh_url}}</h3>--}}
 @foreach ($tweets->statuses as $tweet)
     <p><img src="{{ asset('img/t.png') }}" width=20px>&nbsp;&nbsp;<span style="color:#A62400">{{ $tweet->user->name }}</span>: {{ $tweet->text }}</p>
 @endforeach
