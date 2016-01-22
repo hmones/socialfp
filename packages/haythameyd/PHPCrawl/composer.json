@@ -1,0 +1,20 @@
+{
+    "name": "haythameyd/phpcrawl",
+    "description": "Integrating the Library of PHPCrawler into laravel 5.1",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Haytham Mones",
+            "email": "haythameyd@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+          "Haythameyd\\PHPCrawl\\": "libs/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {
+      "illuminate/support": "~5"
+    }
+}
