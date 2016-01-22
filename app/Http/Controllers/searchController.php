@@ -6,10 +6,12 @@ use Abraham\TwitterOAuth\TwitterOAuth;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use Browser\Casper;
+use Haythameyd\PHPCrawl\PHPCrawler;
 
 class searchController extends Controller
 {
+
+    protected $portalcounter=array();
 
     public function tweetsinf($tweets)
     {
@@ -68,29 +70,40 @@ class searchController extends Controller
       return $GEOdatax;
     }
 
-    public function gtrendsdisplay($query)
+    public function searchportals($query,$urls)
     {
-      $output=$query;
-      $casper = new Casper();
 
-      $casper->setOptions(array(
-          'ignore-ssl-errors' => 'yes'
-      ));
-      $casper->setUserAgent('Mozilla/4.0 (comptible; MSIE 6.0; Windows NT 5.1)');
-      $url='https://www.google.com/trends/explore#q='.$query;
+      $crawler = new PHPCrawler();
+      foreach ($urls as $url) {
+      // URL to crawl
+      $crawler->setURL($url);
 
-      $casper->start($url);
+      $crawler->setquery($query);
 
+      // Only receive content of files with content-type "text/html"
+      $crawler->addContentTypeReceiveRule("#text/html#");
 
-      $casper->wait(5000);
-      $casper->captureSelector('#reportMain', $output);
-      $casper->capturePage('pagesample.png');
+      // Ignore links to pictures, dont even request pictures
+      $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png)$# i");
 
-      $casper->run();
-      $regex = '#\<div id="reportMain"\>(.+?)\<\/div\>#s';
-      preg_match($regex, $output, $matches);
+      // Store and send cookie-data like a browser does
+      $crawler->enableCookieHandling(true);
 
-      return $output;
+      // Set the traffic-limit to 1 MB (in bytes,
+      // for testing we dont want to "suck" the whole site)
+      $crawler->setTrafficLimit(1000 * 1024);
+      // Thats enough, now here we go
+      $crawler->go();
+
+      // At the end, after the process is finished, we print a short
+      // report (see method getProcessReport() for more information)
+      $report = $crawler->getProcessReport();
+
+      echo "Links followed: ".$report->links_followed;
+      echo "Process runtime: ".$report->process_runtime." sec";
+      }
+      $this->portalcounter=$crawler->retreiveportalmentions();
+      return $crawler->retreiveresults();
     }
 
     public function display(Request $request)
@@ -101,6 +114,7 @@ class searchController extends Controller
       //]);
       $tweets="";
       $tweetsinfo="";
+      $portalsmentions="";
       $trends="Nothing until now";
       $keyword = $request->input('keyword');
       $searchtype = $request->input('searchtype');
@@ -110,6 +124,7 @@ class searchController extends Controller
       $social2 = $request->input('social2');
       $website1 = $request->input('website1');
       $website2 = $request->input('website2');
+      $website3 = $request->input('website3');
       $trends1 = $request->input('trends1');
       $location = $request->input('location');
       //converting location to longitude and latitude for twitter search
@@ -121,7 +136,22 @@ class searchController extends Controller
       $tweets=$this->twittersearch($keyword,$dateto,$locationgeo,$searchtype);
       $tweetsinfo=$this->tweetsinf($tweets);
       }
-      $data=array('keyword'=>$keyword,'searchtype'=>$searchtype, 'datefrom'=>$datefrom,'dateto'=>$dateto, 'location'=>$location,'social1'=>$social1,'social2'=>$social2,'website1'=>$website1,'website2'=>$website2,'trends1'=>$trends1,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends,'locationgeo'=>$locationgeo);
+
+      $urls=array();
+
+      if($website1!=NULL)
+      array_push($urls,$website1);
+      if($website2!=NULL)
+      array_push($urls,$website2);
+      if($website3!=NULL)
+      array_push($urls,$website3);
+
+      if($urls!=NULL && $keyword!=NULL)
+      {
+        $portalsmentions=$this->searchportals($keyword,$urls);
+      }
+      $data=array('keyword'=>$keyword,'searchtype'=>$searchtype, 'datefrom'=>$datefrom,'dateto'=>$dateto, 'location'=>$location,'social1'=>$social1,'social2'=>$social2,'website1'=>$website1,'website2'=>$website2,'trends1'=>$trends1,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends,
+      'locationgeo'=>$locationgeo,'portalsresults'=>$portalsmentions,'website3'=>$website3,'portalcounter'=>$this->portalcounter);
       return view('results',$data);
     }
 
