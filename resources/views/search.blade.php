@@ -5,7 +5,8 @@ Social Search Engine
 @stop
 
 @section('content')
-{{--@if (count($errors) > 0)
+{{--
+ @if (count($errors) > 0)
     <div style="margin-top:50px;" class="alert alert-danger">
         <ul>
             @foreach ($errors->all() as $error)
@@ -13,7 +14,8 @@ Social Search Engine
             @endforeach
         </ul>
     </div>
-@endif--}}
+ @endif
+--}}
 <div class="row" style="margin-top:50px;margin-left:10px;">
   <!--
   SEARCH FILTER SECTION
@@ -29,9 +31,10 @@ Social Search Engine
       <h4>Filters:</h4>
         <div class="well col-md-12" style="color:black;">
           <h5>Social Media:</h5>
-          <input type="checkbox" name="social1" value="http://www.twitter.com" @if($social1!=NULL) checked @endif><label>&nbsp;Twitter&nbsp;</label>
-          </br>
-          <input type="checkbox" name="social2" value="http://www.facebook.com" @if($social2!=NULL) checked @endif><label>&nbsp;Facebook&nbsp;</label>
+          <input type="checkbox" name="social1" value="http://www.twitter.com" @if($social1!=NULL) checked @endif ><label>&nbsp;Twitter&nbsp;</label>
+          {{--</br>
+          <input type="checkbox" name="social2" value="http://www.facebook.com" @if($social2!=NULL) checked @endif ><label>&nbsp;Facebook&nbsp;</label>
+          --}}
           </br>
           <select class="form-control" name="searchtype">
             <option value="recent">Recent results</option>
@@ -39,19 +42,21 @@ Social Search Engine
             <option value="mixed">Mixed results</option>
           </select>
           </br>
-          <input type="text" name="datefrom" class="form-control" placeholder="From (yyyy/mm/dd)" @if($datefrom!=NULL) value={{$datefrom}} @endif>
+          <input type="text" name="datefrom" class="form-control" placeholder="From (yyyy/mm/dd)" @if($datefrom!=NULL) value={{$datefrom}} @endif >
           </br>
-          <input type="text" name="dateto" class="form-control" placeholder="To (yyyy/mm/dd)" @if($dateto!=NULL) value={{$dateto}} @endif>
+          <input type="text" name="dateto" class="form-control" placeholder="To (yyyy/mm/dd)" @if($dateto!=NULL) value={{$dateto}} @endif >
           </br>
-            <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif>
+            <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif >
           </br>
           <h5>Trending Portals</h5>
-          <input type="checkbox" name="website1" value="http://www.zastone.ba" @if($website1!=NULL) checked @endif><label>&nbsp; Zastone.ba&nbsp;</label>
+          <input type="checkbox" name="website1" value="http://www.klix.ba" @if($website1!=NULL) checked @endif ><label>&nbsp; Klix&nbsp;</label>
           </br>
-          <input type="checkbox" name="website2" value="http://point.zastone.ba" @if($website2!=NULL) checked @endif><label>&nbsp; Point.zastone.ba&nbsp;</label>
+          <input type="checkbox" name="website2" value="http://www.avaz.ba" @if($website2!=NULL) checked @endif ><label>&nbsp; Avaz&nbsp;</label>
+          </br>
+          <input type="checkbox" name="website3" value="http://ekskluziva.ba/" @if($website3!=NULL) checked @endif ><label>&nbsp; Ekskluziva&nbsp;</label>
           </br>
           <h5>Search Engines</h5>
-          <input type="checkbox" name="trends1" value="http://trends.google.com" @if($trends1!=NULL) checked @endif><label>&nbsp; Google Trends&nbsp;</label>
+          <input type="checkbox" name="trends1" value="http://trends.google.com" @if($trends1!=NULL) checked @endif ><label>&nbsp; Google Trends&nbsp;</label>
           <hr style="border-top:1px solid #972002;">
           <button type="submit" class="btn btn-success">Apply Criteria</button>
         </div>
@@ -68,7 +73,7 @@ Social Search Engine
   It uses a function search site from the search php file
 
   -->
-  <div class="col-md-8" style="background-color: rgba(255, 255, 255, 0.85);">
+  <div class="col-md-8" style="background-color: rgba(255, 255, 255, 0.85);border-radius: 10px;">
     <div>
 
       <!-- Nav tabs -->
@@ -81,7 +86,7 @@ Social Search Engine
       <!-- Tab panes -->
 
 
-      <div class="tab-content">
+      <div class="well tab-content">
         <div role="tabpanel" class="tab-pane active" id="socialmedia">
           @yield('socialmedia')
         </div>
