@@ -21,14 +21,19 @@ Social Footprint
           <div class="col-md-4">
             <h5> Social Media: </h5>
             <input type="checkbox" name="social1" value="http://www.twitter.com" ><label>&nbsp;Twitter&nbsp;</label>
+            {{--
             <br>
             <input type="checkbox" name="social2" value="http://www.facebook.com" ><label>&nbsp;Facebook&nbsp;</label>
+            --}}
           </div>
           <div class="col-md-4">
             <h5> Trending Portals </h5>
-            <input type="checkbox" name="website1" value="http://www.zastone.ba" ><label>&nbsp; Zastone&nbsp;</label>
+            <input type="checkbox" name="website1" value="http://www.klix.ba" ><label>&nbsp; Klix&nbsp;</label>
             <br>
-            <input type="checkbox" name="website2" value="http://point.zastone.ba" ><label>&nbsp; Point&nbsp;</label>
+            <input type="checkbox" name="website2" value="http://www.avaz.ba" ><label>&nbsp; Avaz&nbsp;</label>
+            <br>
+            <input type="checkbox" name="website3" value="http://ekskluziva.ba/" ><label>&nbsp; Ekskluziva&nbsp;</label>
+
           </div>
           <div class="col-md-4">
             <h5> Search Engines </h5>
