@@ -19,7 +19,7 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body background="{{ asset('img/bg.jpg') }}">
+  <body background="{{ asset('img/bg.jpg') }}" style="background-attachment: fixed;">
 
     <!-- NAVIGATION BAR
     This is where we put the links on top
