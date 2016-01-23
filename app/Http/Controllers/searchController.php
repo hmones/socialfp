@@ -18,12 +18,17 @@ class searchController extends Controller
       $count=0;
       $retweets=0;
       $likes=0;
+      $influential=0;
       foreach($tweets->statuses as $obj){
          $retweets=$retweets+$obj->retweet_count;
          $likes=$likes+$obj->favorite_count;
-         $count=$count+1;
+         $count++;
+         if($obj->user->friends_count>1000)
+         {
+           $influential++;
+         }
       }
-      $data=array($likes,$retweets,$count);
+      $data=array($likes,$retweets,$count,$influential);
       return $data;
     }
 
@@ -99,8 +104,8 @@ class searchController extends Controller
       // report (see method getProcessReport() for more information)
       $report = $crawler->getProcessReport();
 
-      echo "Links followed: ".$report->links_followed;
-      echo "Process runtime: ".$report->process_runtime." sec";
+      //echo "Links followed: ".$report->links_followed;
+      //echo "Process runtime: ".$report->process_runtime." sec";
       }
       $this->portalcounter=$crawler->retreiveportalmentions();
       return $crawler->retreiveresults();
