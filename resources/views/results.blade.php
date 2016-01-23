@@ -34,7 +34,6 @@ SocialFootprint
 @stop
 
 @section('googletrends')
-{{--
 @if($trends1==NULL)
   <h2> Please enter a keyword to search ... </h2>
 @else
@@ -49,7 +48,6 @@ SocialFootprint
 <script style="position: absolute;top: 50%;left: 50%;margin-top: -50px; margin-left: -50px;" type="text/javascript" src="//www.google.com/trends/embed.js?hl=en-US&q={{ $keyword }}&cmpt=q&tz=Etc/GMT-1&tz=Etc/GMT-1&content=1&cid=TOP_QUERIES_0_0&export=5&w=500&h=450"></script>
 </div>
 @endif
---}}
 @stop
 
 @section('socialmedia')
