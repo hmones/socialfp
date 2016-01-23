@@ -57,10 +57,18 @@ SocialFootprint
 @else
 <div style="display:block;">
 <h2 style="text-align:center;"> Summary </h2>
-<ul style="margin-left:20%;" class="nav nav-pills" role="tablist">
+
+<div style="text-align:center;">
+<span class="glyphicon glyphicon-retweet" style="font-size:60px;text-align:center;color:#3C763D;">&nbsp;&nbsp;&nbsp;</span>
+<span class="glyphicon glyphicon-heart-empty" style="font-size:60px;text-align:center;color:#A94442;">&nbsp;&nbsp;&nbsp;</span>
+<span class="glyphicon glyphicon-flash" style="font-size:60px;text-align:center;color:#337AB7;"></span>
+</div>
+<br>
+
+<ul style="margin-left:10%;" class="nav nav-pills" role="tablist">
   <li role="presentation" class="active"><a href="#">Retweets and Shares <span class="badge">{{$tweets_info['0']}}</span></a></li>
   <li role="presentation" class="active"><a href="#">Favourites and Likes <span class="badge">{{$tweets_info['1']}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Results found <span class="badge">{{$tweets_info['2']}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Mentions by influential users <span class="badge">{{$tweets_info['3']}}</span></a></li>
 </ul>
 </div>
 <h2> Statuses </h2>
