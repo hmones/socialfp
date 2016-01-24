@@ -5,30 +5,36 @@ SocialFootprint
 @stop
 
 @section('trendingportals')
-@if($website1==NULL || $keyword==NULL)
+@if(($website1==NULL && $website2==NULL && $website3==NULL) || $keyword==NULL)
 <h2> Please enter a keyword to search ...</h2>
 @elseif($portalsresults==NULL)
 <h2>There are no matches</h2>
 @else
+
 <div style="display:block;">
 <h2 style="text-align:center;">Summary</h2>
 <ul style="margin-left:10%;" class="nav nav-pills" role="tablist">
-  <li role="presentation" class="active"><a href="#">Total Mentions <span class="badge">{{count($portalsresults)}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Total Mentions <span class="badge">{{$portalcounter["klix"]+$portalcounter["avaz"]+$portalcounter["nezavisne"]}}</span></a></li>
   <li role="presentation" class="active"><a href="#">Klix mentions <span class="badge">{{$portalcounter["klix"]}}</span></a></li>
   <li role="presentation" class="active"><a href="#">Avaz mentions <span class="badge">{{$portalcounter["avaz"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Ekskluziva mentions <span class="badge">{{$portalcounter["ekskluziva"]}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Nezavisne mentions <span class="badge">{{$portalcounter["nezavisne"]}}</span></a></li>
 </ul>
 </div>
 
 <h2>Top results</h2>
 <div style='margin-left:10px'>
-@foreach ($portalsresults as $result)
-<a href='{{ $result["url"] }}'> <h4>{{ $result["title"] }}</h4></a>
-<p style='color:green;'>{{ $result["url"] }}</p>
-<p>{{$result["desc"]}}</p>
-<hr style='color:border-top: 1px solid #aaaaaa;'>
+@foreach ($portalsresults as $portalresult)
+  @if($portalresult!=NULL)
+    @foreach ($portalresult as $result)
+    <a href='{{ $result["url"] }}'> <h4>{{ $result["title"] }}</h4></a>
+    <p style='color:green;'>{{ $result["url"] }}</p>
+    <p>{{$result["desc"]}}</p>
+    <hr style='color:border-top: 1px solid #aaaaaa;'>
+    @endforeach
+  @endif
 @endforeach
 </div>
+
 
 @endif
 @stop
