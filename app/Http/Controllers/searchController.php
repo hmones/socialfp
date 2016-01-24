@@ -174,7 +174,7 @@ class searchController extends Controller
             //echo "Process runtime: ".$report->process_runtime." sec";
             //$this->portalcounter['nezavisne']=$crawler->portalcounter['nezavisne'];
             $results=$crawler->retreiveresults();
-            $this->portalcounter['nezavisne'] += count($results);
+            $this->portalcounter['nezavisne'] += (count($results)-1);
             break;
           }
 
