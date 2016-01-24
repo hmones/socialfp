@@ -11,7 +11,7 @@ use Haythameyd\PHPCrawl\PHPCrawler;
 class searchController extends Controller
 {
 
-    protected $portalcounter=array();
+    protected $portalcounter=array('klix'=>0,'avaz'=>0,'nezavisne'=>0);
 
     public function tweetsinf($tweets)
     {
@@ -77,38 +77,117 @@ class searchController extends Controller
 
     public function searchportals($query,$urls)
     {
-
-      $crawler = new PHPCrawler();
+      $results=array();
       foreach ($urls as $url) {
+        array_push($results,$this->searchportal($query,$url));
+      }
+      return $results;
+    }
+
+    public function searchportal($query,$url)
+    {
+      $results=array();
       // URL to crawl
-      $crawler->setURL($url);
+      $tempurl="";
+      switch ($url) {
+        case "http://www.klix.ba":
+            $tempurl=$url."/pretraga?pojam=".$query;
+            $crawler = new PHPCrawler();
+            $crawler->setURL($tempurl);
+            $crawler->setCrawlingDepthLimit(0);
+            $crawler->enableCookieHandling(true);
+            $crawler->setTrafficLimit(1000 * 1024);
+            $crawler->go();
+            $doc = new \DOMDocument();
+            libxml_use_internal_errors(true);
+            $doc->loadHTML($crawler->retreiveresults());
+            preg_match('#<span>[\d]+ [\w]+</span>#',$crawler->retreiveresults(),$mentions);
+            preg_match('#[\d]+#',$mentions[0],$mentions);
+            $this->portalcounter['klix'] += $mentions[0];
+            //var_dump($this->portalcounter['klix']);
+            //preg_match('/[\d]+/',$crawler->retreiveresults(),$mentions);
+            $xpath = new \DOMXpath($doc);
+            $articles = $xpath->query('//div[@class="news-line row"]');
+            // all links in .news-line row
+            $links = array();
+            foreach($articles as $container) {
+              $arr = $container->getElementsByTagName("a");
+              foreach($arr as $item) {
+                $href =  $item->getAttribute("href");
+                $href="http://www.klix.ba".$href;
+                $textcode=$doc->saveHTML($item);
+                preg_match('/<h1>(.*?)<\/h1>/s', $textcode, $text);
+                $links[] = array(
+                  'url' => $href,
+                  'title' => $text[1],
+                  'desc' => ""
+                );
+              }
+            }
+            $results=$links;
+            break;
+        case "http://www.avaz.ba":
+            $tempurl=$url."/pretraga?keyword=".$query;
+            $tempdoc=file_get_contents($tempurl);
+            $doc = new \DOMDocument();
+            libxml_use_internal_errors(true);
+            $doc->loadHTML($tempdoc);
+            $xpath = new \DOMXpath($doc);
+            $articles = $xpath->query('//article[@class="preview hybrid"]');
+            // all links in .news-line row
+            $links = array();
+            foreach($articles as $container) {
+              $arr = $container->getElementsByTagName("a");
 
-      $crawler->setquery($query);
-
-      // Only receive content of files with content-type "text/html"
-      $crawler->addContentTypeReceiveRule("#text/html#");
-
-      // Ignore links to pictures, dont even request pictures
-      $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png)$# i");
-
-      // Store and send cookie-data like a browser does
-      $crawler->enableCookieHandling(true);
-
-      // Set the traffic-limit to 1 MB (in bytes,
-      // for testing we dont want to "suck" the whole site)
-      $crawler->setTrafficLimit(1000 * 1024);
-      // Thats enough, now here we go
-      $crawler->go();
+              foreach($arr as $item) {
+                $href =  $item->getAttribute("href");
+                $href="http://www.avaz.ba".$href;
+                //var_dump($href);
+                $textcode=$doc->saveHTML($container);
+                preg_match('/<p>(.*?)<\/p>/s', $textcode, $desc);
+                preg_match('/<h2>(.*?)<\/h2>/s', $textcode, $title);
+                $title[1]=strip_tags($title[1]);
+                $links[] = array(
+                  'url' => $href,
+                  'title' => $title[1],
+                  'desc' => $desc[1]
+                );
+                break;
+              }
+            }
+            $this->portalcounter['avaz'] += count($links);
+            $results=$links;
+            break;
+        case "http://www.nezavisne.com/":
+            $crawler = new PHPCrawler();
+            $crawler->setURL($url);
+            $crawler->setquery($query);
+            $crawler->addContentTypeReceiveRule("#text/html#");
+            $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png)$# i");
+            $crawler->enableCookieHandling(true);
+            // Set the traffic-limit to 1 MB (in bytes,
+            $crawler->setTrafficLimit(4000 * 1024);
+            // Thats enough, now here we go
+            $crawler->go();
+            //$report = $crawler->getProcessReport();
+            //echo "Links followed: ".$report->links_followed;
+            //echo "Process runtime: ".$report->process_runtime." sec";
+            //$this->portalcounter['nezavisne']=$crawler->portalcounter['nezavisne'];
+            $results=$crawler->retreiveresults();
+            $this->portalcounter['nezavisne'] += count($results);
+            break;
+          }
 
       // At the end, after the process is finished, we print a short
       // report (see method getProcessReport() for more information)
-      $report = $crawler->getProcessReport();
-
+      //$report = $crawler->getProcessReport();
       //echo "Links followed: ".$report->links_followed;
       //echo "Process runtime: ".$report->process_runtime." sec";
-      }
-      $this->portalcounter=$crawler->retreiveportalmentions();
-      return $crawler->retreiveresults();
+
+      //$this->portalcounter['avaz'] += $temp_counter['avaz'];
+      //$this->portalcounter['ekskluziva'] += $temp_counter['ekskluziva'];
+
+      return $results;
     }
 
     public function display(Request $request)
