@@ -53,7 +53,7 @@ Social Search Engine
           </br>
           <input type="checkbox" name="website2" value="http://www.avaz.ba" @if($website2!=NULL) checked @endif ><label>&nbsp; Avaz&nbsp;</label>
           </br>
-          <input type="checkbox" name="website3" value="http://ekskluziva.ba/" @if($website3!=NULL) checked @endif ><label>&nbsp; Ekskluziva&nbsp;</label>
+          <input type="checkbox" name="website3" value="http://www.nezavisne.com/" @if($website3!=NULL) checked @endif ><label>&nbsp; Nezavisne&nbsp;</label>
           </br>
           <h5>Search Engines</h5>
           <input type="checkbox" name="trends1" value="http://trends.google.com" @if($trends1!=NULL) checked @endif ><label>&nbsp; Google Trends&nbsp;</label>
