@@ -32,7 +32,7 @@ Social Footprint
             <br>
             <input type="checkbox" name="website2" value="http://www.avaz.ba" ><label>&nbsp; Avaz&nbsp;</label>
             <br>
-            <input type="checkbox" name="website3" value="http://ekskluziva.ba/" ><label>&nbsp; Ekskluziva&nbsp;</label>
+            <input type="checkbox" name="website3" value="http://www.nezavisne.com/" ><label>&nbsp; Nezavisne&nbsp;</label>
 
           </div>
           <div class="col-md-4">
