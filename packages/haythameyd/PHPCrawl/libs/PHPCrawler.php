@@ -13,8 +13,8 @@ namespace Haythameyd\PHPCrawl;
 class PHPCrawler
 {
   protected $query="";
-  protected $searchresult= array();
-  protected $portalcounter=array('klix'=>0,'avaz'=>0,'ekskluziva'=>0);
+  protected $searchresult=array();
+  protected $portalcounter=array('klix'=>0,'avaz'=>0,'nezavisne'=>0);
 
   public $class_version = "0.83rc1";
 
@@ -1072,7 +1072,8 @@ class PHPCrawler
 
   public function getTextBetweenTags($string, $tagname)
   {
-    preg_match( "/\<{$tagname}\>(.*)\<\/{$tagname}\>/", $string, $matches);
+    $p="/\<".$tagname."\>(.*)\<\/".$tagname."\>/";
+    preg_match($p, $string, $matches);
     $result="No Title";
     if($matches!=NULL)
     {
@@ -1135,24 +1136,29 @@ class PHPCrawler
    */
   public function handleDocumentInfo(PHPCrawlerDocumentInfo $PageInfo)
   {
+    if($PageInfo->host == "www.nezavisne.com")
+    {
     $before="/(.*";
     $after=".*)/";
     $q=$before.$this->query.$after;
     //$query= '/(.*diskriminaciju.*)/';
-    preg_match($q,$PageInfo->content,$matches,PREG_OFFSET_CAPTURE, 3);
-    if ($matches && $PageInfo->received == true)
+    if (preg_match($q,$PageInfo->content,$matches))
     {
-      $title=$this->getTextBetweenTags($PageInfo->content, "title");
+      preg_match("#<title itemprop='name'>(.*)</title>#",$PageInfo->content, $title);
+      $title=strip_tags($title[1]);
       $url=$PageInfo->url;
-      $desc=implode("...",$matches[0]);
+      $desc=$matches[0];
       $desc=strip_tags($desc);
-      if($PageInfo->host == "www.klix.ba") $this->portalcounter['klix']++;
-      if($PageInfo->host == "www.avaz.ba") $this->portalcounter['avaz']++;
-      if($PageInfo->host == "www.ekskluziva.ba") $this->portalcounter['ekskluziva']++;
+      $desc=substr($desc,0,255);
+      $this->portalcounter['nezavisne']++;
       $result_added=array('title'=>$title,'url'=>$url,'desc'=>$desc);
       array_push($this->searchresult,$result_added);
     }
-
+    }
+    else
+    {
+    $this->searchresult=$PageInfo->content;
+    }
     flush();
   }
 
