@@ -91,89 +91,14 @@ class searchController extends Controller
       $tempurl="";
       switch ($url) {
         case "http://www.klix.ba":
-            $tempurl=$url."/pretraga?pojam=".$query;
-            $crawler = new PHPCrawler();
-            $crawler->setURL($tempurl);
-            $crawler->setCrawlingDepthLimit(0);
-            $crawler->enableCookieHandling(true);
-            $crawler->setTrafficLimit(1000 * 1024);
-            $crawler->go();
-            $doc = new \DOMDocument();
-            libxml_use_internal_errors(true);
-            $doc->loadHTML($crawler->retreiveresults());
-            preg_match('#<span>[\d]+ [\w]+</span>#',$crawler->retreiveresults(),$mentions);
-            preg_match('#[\d]+#',$mentions[0],$mentions);
-            $this->portalcounter['klix'] += $mentions[0];
-            //var_dump($this->portalcounter['klix']);
-            //preg_match('/[\d]+/',$crawler->retreiveresults(),$mentions);
-            $xpath = new \DOMXpath($doc);
-            $articles = $xpath->query('//div[@class="news-line row"]');
-            // all links in .news-line row
-            $links = array();
-            foreach($articles as $container) {
-              $arr = $container->getElementsByTagName("a");
-              foreach($arr as $item) {
-                $href =  $item->getAttribute("href");
-                $href="http://www.klix.ba".$href;
-                $textcode=$doc->saveHTML($item);
-                preg_match('/<h1>(.*?)<\/h1>/s', $textcode, $text);
-                $links[] = array(
-                  'url' => $href,
-                  'title' => $text[1],
-                  'desc' => ""
-                );
-              }
-            }
-            $results=$links;
+            $results=$this->searchklix($query,$url);
             break;
         case "http://www.avaz.ba":
-            $tempurl=$url."/pretraga?keyword=".$query;
-            $tempdoc=file_get_contents($tempurl);
-            $doc = new \DOMDocument();
-            libxml_use_internal_errors(true);
-            $doc->loadHTML($tempdoc);
-            $xpath = new \DOMXpath($doc);
-            $articles = $xpath->query('//article[@class="preview hybrid"]');
-            // all links in .news-line row
-            $links = array();
-            foreach($articles as $container) {
-              $arr = $container->getElementsByTagName("a");
-
-              foreach($arr as $item) {
-                $href =  $item->getAttribute("href");
-                $href="http://www.avaz.ba".$href;
-                //var_dump($href);
-                $textcode=$doc->saveHTML($container);
-                preg_match('/<p>(.*?)<\/p>/s', $textcode, $desc);
-                preg_match('/<h2>(.*?)<\/h2>/s', $textcode, $title);
-                $title[1]=strip_tags($title[1]);
-                $links[] = array(
-                  'url' => $href,
-                  'title' => $title[1],
-                  'desc' => $desc[1]
-                );
-                break;
-              }
-            }
-            $this->portalcounter['avaz'] += count($links);
+            $links = $this->searchavaz($query,$url);
             $results=$links;
             break;
         case "http://www.nezavisne.com/":
-            $crawler = new PHPCrawler();
-            $crawler->setURL($url);
-            $crawler->setquery($query);
-            $crawler->addContentTypeReceiveRule("#text/html#");
-            $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png)$# i");
-            $crawler->enableCookieHandling(true);
-            // Set the traffic-limit to 1 MB (in bytes,
-            $crawler->setTrafficLimit(4000 * 1024);
-            // Thats enough, now here we go
-            $crawler->go();
-            //$report = $crawler->getProcessReport();
-            //echo "Links followed: ".$report->links_followed;
-            //echo "Process runtime: ".$report->process_runtime." sec";
-            //$this->portalcounter['nezavisne']=$crawler->portalcounter['nezavisne'];
-            $results=$crawler->retreiveresults();
+            $results= $this->searchnezavisne($query,$url);
             $this->portalcounter['nezavisne'] += (count($results)-1);
             break;
           }
@@ -188,6 +113,117 @@ class searchController extends Controller
       //$this->portalcounter['ekskluziva'] += $temp_counter['ekskluziva'];
 
       return $results;
+    }
+
+    public function searchnezavisne($query,$url)
+    {
+      $crawler = new PHPCrawler();
+      $crawler->setURL($url);
+      $crawler->setquery($query);
+      $crawler->addContentTypeReceiveRule("#text/html#");
+      $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png)$# i");
+      $crawler->enableCookieHandling(true);
+      // Set the traffic-limit to 1 MB (in bytes,
+      $crawler->setTrafficLimit(4000 * 1024);
+      // Thats enough, now here we go
+      $crawler->go();
+      //$report = $crawler->getProcessReport();
+      //echo "Links followed: ".$report->links_followed;
+      //echo "Process runtime: ".$report->process_runtime." sec";
+      //$this->portalcounter['nezavisne']=$crawler->portalcounter['nezavisne'];
+      return $crawler->retreiveresults();
+    }
+
+    public function searchklix($query,$url)
+    {
+      $tempurl=$url."/pretraga?pojam=".$query;
+      $crawler = new PHPCrawler();
+      $crawler->setURL($tempurl);
+      $crawler->setCrawlingDepthLimit(0);
+      $crawler->enableCookieHandling(true);
+      $crawler->setTrafficLimit(1000 * 1024);
+      $crawler->go();
+      $doc = new \DOMDocument();
+      libxml_use_internal_errors(true);
+      $doc->loadHTML($crawler->retreiveresults());
+      preg_match('#<span>[\d]+ [\w]+</span>#',$crawler->retreiveresults(),$mentions);
+      preg_match('#[\d]+#',$mentions[0],$mentions);
+      $this->portalcounter['klix'] += $mentions[0];
+      //var_dump($this->portalcounter['klix']);
+      //preg_match('/[\d]+/',$crawler->retreiveresults(),$mentions);
+      $xpath = new \DOMXpath($doc);
+      $articles = $xpath->query('//div[@class="news-line row"]');
+      // all links in .news-line row
+      $links = array();
+      foreach($articles as $container) {
+        $arr = $container->getElementsByTagName("a");
+        foreach($arr as $item) {
+          $href =  $item->getAttribute("href");
+          $href="http://www.klix.ba".$href;
+          $textcode=$doc->saveHTML($item);
+          preg_match('/<h1>(.*?)<\/h1>/s', $textcode, $text);
+          $links[] = array(
+            'url' => $href,
+            'title' => $text[1],
+            'desc' => ""
+          );
+        }
+      }
+      return $links;
+    }
+
+
+    public function searchavaz($query,$url)
+    {
+      $links=array();
+      $tempurl=$url."/pretraga/page:1?keyword=".$query;
+      $tempdoc=file_get_contents($tempurl);
+      $doc = new \DOMDocument();
+      libxml_use_internal_errors(true);
+      $doc->loadHTML($tempdoc);
+      $xpath = new \DOMXpath($doc);
+      $articles = $xpath->query('//article[@class="preview hybrid"]');
+      // all links in .news-line row
+        foreach($articles as $container) {
+          $arr = $container->getElementsByTagName("a");
+          $href =  $arr[2]->getAttribute("href");
+          $href="http://www.avaz.ba".$href;
+          $textcode=$doc->saveHTML($container);
+          preg_match('/<p>(.*?)<\/p>/s', $textcode, $desc);
+          preg_match('/<h2>(.*?)<\/h2>/s', $textcode, $title);
+          $title[1]=strip_tags($title[1]);
+          $templinks[] = array(
+            'url' => $href,
+            'title' => $title[1],
+            'desc' => $desc[1]
+          );
+        }
+      $this->portalcounter['avaz'] += count($templinks);
+
+      //This function calculates the number of result pages in the search by using binary search technique
+      $x=50; $min=2; $max=100; $numberofpages=1;
+      while(TRUE)
+      {
+        $tempurl=$url."/pretraga/page:".$x."?keyword=".$query;
+        if (@file_get_contents($tempurl))
+        {
+          $min=$x;
+          $x=floor(($max+$x)/2);
+        }
+        else {
+          $max=$x;
+          $x=floor(($min+$x)/2);
+        }
+        if($min==$max || ($max-$min)<=1)
+        {
+          $numberofpages=$x;
+          break;
+        }
+      }
+
+      $this->portalcounter['avaz'] += (20*$numberofpages);
+
+      return $templinks;
     }
 
     public function display(Request $request)
