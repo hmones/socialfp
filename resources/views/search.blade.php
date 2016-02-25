@@ -1,7 +1,7 @@
 @extends('default')
 
 @section('title')
-Social Search Engine
+Social Footprint
 @stop
 
 @section('content')
@@ -49,11 +49,7 @@ Social Search Engine
             <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif >
           </br>
           <h5>Trending Portals</h5>
-          <input type="checkbox" name="website1" value="http://www.klix.ba" @if($website1!=NULL) checked @endif ><label>&nbsp; Klix&nbsp;</label>
-          </br>
-          <input type="checkbox" name="website2" value="http://www.avaz.ba" @if($website2!=NULL) checked @endif ><label>&nbsp; Avaz&nbsp;</label>
-          </br>
-          <input type="checkbox" name="website3" value="http://www.nezavisne.com/" @if($website3!=NULL) checked @endif ><label>&nbsp; Nezavisne&nbsp;</label>
+          <input type="checkbox" name="portals" value="yes" @if($portals!=NULL) checked @endif ><label>&nbsp; Portals&nbsp;</label>
           </br>
           <h5>Search Engines</h5>
           <input type="checkbox" name="trends1" value="http://trends.google.com" @if($trends1!=NULL) checked @endif ><label>&nbsp; Google Trends&nbsp;</label>

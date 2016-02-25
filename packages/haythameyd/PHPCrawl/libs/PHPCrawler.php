@@ -1,6 +1,10 @@
 <?php
 
 namespace Haythameyd\PHPCrawl;
+use App\results;
+use DB;
+use Log;
+use DateTime;
 
 /**
  * PHPCrawl mainclass
@@ -12,9 +16,6 @@ namespace Haythameyd\PHPCrawl;
  */
 class PHPCrawler
 {
-  protected $query="";
-  protected $searchresult=array();
-  protected $portalcounter=array('klix'=>0,'avaz'=>0,'nezavisne'=>0);
 
   public $class_version = "0.83rc1";
 
@@ -1065,11 +1066,6 @@ class PHPCrawler
   {
   }
 
-  public function setquery($query)
-  {
-    $this->query=$query;
-  }
-
   public function getTextBetweenTags($string, $tagname)
   {
     $p="/\<".$tagname."\>(.*)\<\/".$tagname."\>/";
@@ -1082,22 +1078,48 @@ class PHPCrawler
     return $result;
   }
 
-  public function retreiveresults()
+  public function CountShares($url)
   {
-    if($this->searchresult!=NULL)
-    {
-      $result=$this->searchresult;
-    }
-    else{
-      $result="";
-    }
-    return $result;
-  }
+      $SMresults=array('gp_shares'=>0,'fb_likes'=>0,'fb_shares'=>0,'fb_comments'=>0);
 
-  public function retreiveportalmentions()
-  {
-    return $this->portalcounter;
-  }
+        //Twitter function is deprecated
+        // $json_string = file_get_contents(sprintf('http://urls.api.twitter.com/1/urls/count.json?url=%s', $url));
+        // $json = json_decode($json_string, true);
+        // if (!empty($json['count']))
+        //     return $json['count'];
+        // return 0;
+        //print('fbin');
+        $context = stream_context_create(array('http' => array('ignore_errors' => true),));
+        $json_string = @file_get_contents(sprintf('https://api.facebook.com/method/links.getStats?urls=%s&format=json', $url),false, $context);
+        if($json_string==false || $json_string==NULL){
+          Log::info('Facebook API failed for this URL: '.$url);
+        }else{
+          $json = json_decode($json_string, true);
+
+          if (!empty($json[0]['share_count']))
+              $SMresults['fb_shares']= $json[0]['share_count'];
+          if (!empty($json[0]['like_count']))
+              $SMresults['fb_likes']= $json[0]['like_count'];
+          if (!empty($json[0]['comment_count']))
+              $SMresults['fb_comments']= $json[0]['comment_count'];
+        }
+        //print('fbout');
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, "https://clients6.google.com/rpc");
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, '[{"method":"pos.plusones.get","id":"p","params":{"nolog":true,"id":"' . $url . '","source":"widget","userId":"@viewer","groupId":"@self"},"jsonrpc":"2.0","key":"p","apiVersion":"v1"}]');
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type: application/json'));
+        $curl_results = curl_exec ($curl);
+        curl_close ($curl);
+        $json = json_decode($curl_results, true);
+        if (!empty($json[0]['result']['metadata']['globalCounts']['count']))
+            $SMresults['gp_shares']= $json[0]['result']['metadata']['globalCounts']['count'];
+
+      return $SMresults;
+    }
+
   /**
    * Override this method to get access to all information about a page or file the crawler found and received.
    *
@@ -1136,30 +1158,341 @@ class PHPCrawler
    */
   public function handleDocumentInfo(PHPCrawlerDocumentInfo $PageInfo)
   {
-    if($PageInfo->host == "www.nezavisne.com")
+
+      $pagehtml = new \simple_html_dom();
+      $pagehtml = str_get_html($PageInfo->content);
+      $previousURL = DB::select('select * from results where url = ?', [$PageInfo->url]);
+      $months_trans = array('januar'=>'01','februar'=>'02','mart'=>'03','april'=>'04','maj'=>'05','juni'=>'06','juli'=>'07','august'=>'08','septembar'=>'09','oktobar'=>'10','novembar'=>'11','decembar'=>'12');
+      $months_trans_CR = array('sijecnja'=>'01','veljace'=>'02','ozujka'=>'03','travnja'=>'04','svibnja'=>'05','lipnja'=>'06','srpnja'=>'07','kolovoza'=>'08','rujna'=>'09','listopada'=>'10','studenog'=>'11','prosinca'=>'12');
+      $months_trans_EN = array('jan'=>'01','feb'=>'02','mar'=>'03','apr'=>'04','may'=>'05','jun'=>'06','jul'=>'07','aug'=>'08','sep'=>'09','okt'=>'10','nov'=>'11','dec'=>'12');
+
+      if($pagehtml && $previousURL==NULL)
+      {
+        if($pagehtml->find('body',0)!=NULL)
+        {
+
+          print($PageInfo->url);
+          print(' ||| ');
+
+          $result= new results;
+          $title=$pagehtml->find('title',0);
+          if ($title!=NULL){
+            $result->page_title=$title->innertext;
+          }else{
+            $result->page_title="Untitled";
+          }
+          $result->url=$PageInfo->url;
+
+          $result->content=$pagehtml->find('body',0)->plaintext;
+
+          if (array_key_exists('description',$PageInfo->meta_attributes))
+          {
+            $result->description=$PageInfo->meta_attributes['description'];
+          }else{
+            $result->description=substr($result->content,0,255);
+          }
+
+          $result->portal=$PageInfo->host;
+          $result->last_update=date("Y/m/d h:i:s");
+
+
+          //This Section grabs the date of the article based on its code structure
+          //---------------------------------
+
+          if($result->portal=="www.avaz.ba")
+          {
+            $container=$pagehtml->find('div[class=box article] div[class=misc] span',0);
+            if($container!=NULL)
+            {
+              $container=preg_replace("/[^0-9]/","",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="www.klix.ba") {
+            if (array_key_exists('twitter:url',$PageInfo->meta_attributes))
+            {
+              $year='20'.substr($PageInfo->meta_attributes['twitter:url'],-9,-7);
+              $month=substr($PageInfo->meta_attributes['twitter:url'],-7,-5);
+              $day=substr($PageInfo->meta_attributes['twitter:url'],-5,-3);
+              $date=$year.'-'.$month.'-'.$day;
+              if (checkdate($month,$day,$year)) {
+                $result->date=$date;
+                $result->isArticle=true;
+              }
+            }
+          }elseif ($result->portal=="www.radiosarajevo.ba" || $result->portal=="radiosarajevo.ba") {
+            $container=$pagehtml->find('div[class=news_date]',0);
+            if($container!=NULL)
+            {
+              $container=trim($container->plaintext);
+              $dayyear=preg_replace("/[^0-9]/","",$container);
+              $day=substr($dayyear,0,2);
+              $year=substr($dayyear,2,4);
+              $month=preg_replace("/[^A-z]/","",$container);
+              $month=substr($month,0, -1);
+              $month=$months_trans[$month];
+              $result->date=$year.'-'.$month.'-'.$day;
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="balkans.aljazeera.net") {
+            $container=$pagehtml->find('meta[property=article:published_time]',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->content,0,10);
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="www.nezavisne.com") {
+            $container=$pagehtml->find('time[class=dateline text-muted]',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->datetime,0,10);
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="www.fokus.ba") {
+            $container=$pagehtml->find('meta[property=article:modified_time]',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->content,0,10);
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="www.bljesak.info" || $result->portal=="bljesak.info") {
+            $container=$pagehtml->find('div[class=info] div',0);
+
+            if($container!=NULL)
+            {
+              $container=preg_replace('/č/','c',$container->plaintext);
+              $container=preg_replace('/ž/','z',$container);
+              $container=preg_replace('/\w+: \w+, /',"",$container);
+              $dayyear=preg_replace('/[^0-9]/',"",$container);
+              $day=substr($dayyear,0,2);
+              $year=substr($dayyear,2,4);
+              $month=preg_replace("/[0-9\s\.:]/","",$container);
+              $month=$months_trans_CR[$month];
+              $result->date=$year.'-'.$month.'-'.$day;
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="www.ekskluziva.ba" || $result->portal=="ekskluziva.ba") {
+            $container=$pagehtml->find('div[class=boxNaslov clanaknaslov] div[class=datum]',0);
+            if($container!=NULL)
+            {
+              $container=trim($container->plaintext);
+              $result->date='20'.substr($container,6,2).'-'.substr($container,3,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }elseif ($result->portal=="www.abc.ba" || $result->portal=="abc.ba") {
+            $container=$pagehtml->find('div[class=all datum]',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.vecernji.ba" || $result->portal=="vecernji.ba") {
+            $container=$pagehtml->find('header[class=detail_head cf] div[class=top cf] aside[class=meta] p',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9\.]/',"",$container->plaintext);
+              if(strlen($container)==14)
+              {$result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);}
+              elseif (strlen($container)==12) {
+                $result->date=substr($container,4,4).'-'.'0'.substr($container,2,1).'-'.'0'.substr($container,0,1);
+              }elseif (preg_match('/\.\d\./',$container)) {
+                $result->date=substr($container,5,4).'-'.'0'.substr($container,3,1).'-'.substr($container,0,2);
+              }else{
+                $result->date=substr($container,5,4).'-'.substr($container,2,2).'-'.'0'.substr($container,0,1);
+              }
+            $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.biscani.net" || $result->portal=="biscani.ba") {
+            $container=$pagehtml->find('div[id=post-info22] a',0);
+            if ($container!=NULL)
+            {
+              // $container=preg_replace('/\/[0-9 \.A-z]+/',"",$container->plaintext);
+              // $year_day=preg_replace('/[^0-9\.]/',"",$container);
+              // $year=substr($year_day,-4);
+              // $day=preg_replace('/\..+/','',$year_day);
+              // if(strlen($day)==1)$day='0'.$day;
+              // $month=preg_replace('/\s\d+\s.+/','',$container);
+              // $month=preg_replace('/[^A-z]/',"",$month);
+              // $index=strtolower($month).'a';
+              // To be continued
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.cazin.net" || $result->portal=="cazin.ba") {
+            $container=$pagehtml->find('p[class=postmeta] span time',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.faktor.ba" || $result->portal=="faktor.ba") {
+            $container=$pagehtml->find('meta[property=article:modified_time]',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->content,0,10);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.glassrpske.com" || $result->portal=="glassrpske.ba") {
+            $container=$pagehtml->find('div[class=vijest] cite',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.n1info.com" || $result->portal=="n1info.ba" || $result->portal=="ba.n1info.com") {
+            $container=$pagehtml->find('article time',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->datetime,0,10);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.hayat.ba" || $result->portal=="hayat.ba") {
+            $container=$pagehtml->find('div[id=content] div[class=date]',0);
+            if ($container!=NULL)
+            {
+              $day=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $day=substr($day,0,-4);
+              if(strlen($day)==1)$day='0'.$day;
+              $year=date('Y');
+              $month=preg_replace('/[^A-z]/',"",$container->plaintext);
+              $result->date=$year.'-'.$months_trans_EN[$month].'-'.$day;
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.haber.ba" || $result->portal=="haber.ba") {
+            $container=$pagehtml->find('meta[property=article:modified_time]',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->content,0,10);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.krajina.ba" || $result->portal=="krajina.ba") {
+            $container=$pagehtml->find('article div header div[class=td-post-date] time',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->datetime,0,10);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.oslobodjenje.ba" || $result->portal=="oslobodjenje.ba") {
+            $container=$pagehtml->find('div[id=noviarticle] p[class=author]',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.bh-index.com" || $result->portal=="bh-index.ba") {
+            $container=$pagehtml->find('meta[property=article:modified_time]',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->content,0,10);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.source.ba" || $result->portal=="source.ba") {
+            $container=$pagehtml->find('div[class=vrijemeObjaveClanka]',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9\.]/',"",$container->plaintext);
+              $container=substr($container,0,-4);
+              $year=substr($container,-4);
+              $day=preg_replace('/\..*/',"",$container);
+              if(strlen($day)==1)$day='0'.$day;
+              preg_match('/\..*\./',$container,$month);
+              $month=preg_replace('/[^0-9]/',"",$month[0]);
+              if(strlen($month)==1)$month='0'.$month;
+              $result->date=$year.'-'.$month.'-'.$day;
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.depo.ba" || $result->portal=="depo.ba") {
+            $container=$pagehtml->find('p[class=writtenBy]',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date='20'.substr($container,4,2).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.vijesti.ba" || $result->portal=="vijesti.ba") {
+            $container=$pagehtml->find('div[class=articleView article] h2',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.novi.ba" || $result->portal=="novi.ba") {
+            $container=$pagehtml->find('div[class=article-view] header div div[class=misc] div[class=info] div[class=date] span',0);
+            if ($container!=NULL)
+            {
+              $container=preg_replace('/[^0-9]/',"",$container->plaintext);
+              $result->date=substr($container,4,4).'-'.substr($container,2,2).'-'.substr($container,0,2);
+              $result->isArticle=true;
+            }
+          }
+          elseif ($result->portal=="www.sportsport.ba" || $result->portal=="sportsport.ba") {
+            $container=$pagehtml->find('div[id=news_page] article time',0);
+            if ($container!=NULL)
+            {
+              $result->date=substr($container->datetime,0,10);
+              $result->isArticle=true;
+            }
+          }
+
+          if($result->isArticle)
+          {
+            $socialshares = array();
+            $socialshares = $this->CountShares($PageInfo->url);
+            $result->fb_likes=$socialshares['fb_likes'];
+            $result->fb_shares=$socialshares['fb_shares'];
+            $result->fb_comments=$socialshares['fb_comments'];
+            $result->gp_shares=$socialshares['gp_shares'];
+            $result->total_shares=$socialshares['fb_likes']+$socialshares['fb_shares']+$socialshares['fb_comments']+$socialshares['gp_shares'];
+          }
+          $result->save();
+
+      }
+    }elseif($pagehtml==false)
     {
-    $before="/(.*";
-    $after=".*)/";
-    $q=$before.$this->query.$after;
-    //$query= '/(.*diskriminaciju.*)/';
-    if (preg_match($q,$PageInfo->content,$matches))
+      Log::info('FAULTY URL:'.$PageInfo->url);
+    }else // The document is a duplicate of a previous one
     {
-      preg_match("#<title itemprop='name'>(.*)</title>#",$PageInfo->content, $title);
-      $title=strip_tags($title[1]);
-      $url=$PageInfo->url;
-      $desc=$matches[0];
-      $desc=strip_tags($desc);
-      $desc=substr($desc,0,255);
-      $this->portalcounter['nezavisne']++;
-      $result_added=array('title'=>$title,'url'=>$url,'desc'=>$desc);
-      array_push($this->searchresult,$result_added);
-    }
-    }
-    else
-    {
-    $this->searchresult=$PageInfo->content;
-    }
+
+        if($previousURL[0]->isArticle) // in case it's an article only grab the social mentions
+        {
+          $date1=new DateTime("now");
+          $date2=new DateTime($previousURL[0]->date);
+          $diff=date_diff($date2,$date1);
+          if($diff->days <= 30) //in case the article is not older than 30 days still update the social mentions
+          {
+            $socialshares = array();
+            $socialshares = $this->CountShares($PageInfo->url);
+            $total_shares=$socialshares['fb_likes']+$socialshares['fb_shares']+$socialshares['fb_comments']+$socialshares['gp_shares'];
+
+            DB::table('results')
+            ->where ("url",$PageInfo->url)
+            ->update(['fb_likes'=>$socialshares['fb_likes'],'fb_shares'=>$socialshares['fb_shares'],'fb_comments'=>$socialshares['fb_comments'],'gp_shares'=>$socialshares['gp_shares'],'total_shares'=>$total_shares]);
+          }
+
+        }
+      print('Duplicate Record ||| ');
+      }
     flush();
+
   }
 
   /**

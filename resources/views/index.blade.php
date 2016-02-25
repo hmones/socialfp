@@ -28,11 +28,7 @@ Social Footprint
           </div>
           <div class="col-md-4">
             <h5> Trending Portals </h5>
-            <input type="checkbox" name="website1" value="http://www.klix.ba" ><label>&nbsp; Klix&nbsp;</label>
-            <br>
-            <input type="checkbox" name="website2" value="http://www.avaz.ba" ><label>&nbsp; Avaz&nbsp;</label>
-            <br>
-            <input type="checkbox" name="website3" value="http://www.nezavisne.com/" ><label>&nbsp; Nezavisne&nbsp;</label>
+            <input type="checkbox" name="portals" value="yes" ><label>&nbsp; Portals&nbsp;</label>
 
           </div>
           <div class="col-md-4">

@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Haythameyd\PHPCrawl\PHPCrawler;
+use App\results;
 
 class searchController extends Controller
 {
 
-    protected $portalcounter=array('klix'=>0,'avaz'=>0,'nezavisne'=>0);
+    protected $social_statistics=array('fb_likes'=>0,'fb_shares'=>0,'fb_comments'=>0,'gp_shares'=>0,'total_shares'=>0);
 
     public function tweetsinf($tweets)
     {
@@ -75,155 +76,37 @@ class searchController extends Controller
       return $GEOdatax;
     }
 
-    public function searchportals($query,$urls)
+    public function update_social_count($social_stats)
     {
-      $results=array();
-      foreach ($urls as $url) {
-        array_push($results,$this->searchportal($query,$url));
-      }
-      return $results;
+      global $social_statistics;
+      $social_statistics['fb_likes']=$social_stats['fb_likes'];
+      $social_statistics['fb_shares']=$social_stats['fb_shares'];
+      $social_statistics['fb_comments']=$social_stats['fb_comments'];
+      $social_statistics['gp_shares']=$social_stats['gp_shares'];
+      $social_statistics['total_shares']=$social_stats['total_shares'];
     }
 
-    public function searchportal($query,$url)
+    public function searchportals ($keyword,$datefrom,$dateto)
     {
-      $results=array();
-      // URL to crawl
-      $tempurl="";
-      switch ($url) {
-        case "http://www.klix.ba":
-            $results=$this->searchklix($query,$url);
-            break;
-        case "http://www.avaz.ba":
-            $links = $this->searchavaz($query,$url);
-            $results=$links;
-            break;
-        case "http://www.nezavisne.com/":
-            $results= $this->searchnezavisne($query,$url);
-            $this->portalcounter['nezavisne'] += (count($results)-1);
-            break;
-          }
-
-      // At the end, after the process is finished, we print a short
-      // report (see method getProcessReport() for more information)
-      //$report = $crawler->getProcessReport();
-      //echo "Links followed: ".$report->links_followed;
-      //echo "Process runtime: ".$report->process_runtime." sec";
-
-      //$this->portalcounter['avaz'] += $temp_counter['avaz'];
-      //$this->portalcounter['ekskluziva'] += $temp_counter['ekskluziva'];
-
-      return $results;
-    }
-
-    public function searchnezavisne($query,$url)
-    {
-      $crawler = new PHPCrawler();
-      $crawler->setURL($url);
-      $crawler->setquery($query);
-      $crawler->addContentTypeReceiveRule("#text/html#");
-      $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png)$# i");
-      $crawler->enableCookieHandling(true);
-      // Set the traffic-limit to 1 MB (in bytes,
-      $crawler->setTrafficLimit(4000 * 1024);
-      // Thats enough, now here we go
-      $crawler->go();
-      //$report = $crawler->getProcessReport();
-      //echo "Links followed: ".$report->links_followed;
-      //echo "Process runtime: ".$report->process_runtime." sec";
-      //$this->portalcounter['nezavisne']=$crawler->portalcounter['nezavisne'];
-      return $crawler->retreiveresults();
-    }
-
-    public function searchklix($query,$url)
-    {
-      $tempurl=$url."/pretraga?pojam=".$query;
-      $crawler = new PHPCrawler();
-      $crawler->setURL($tempurl);
-      $crawler->setCrawlingDepthLimit(0);
-      $crawler->enableCookieHandling(true);
-      $crawler->setTrafficLimit(1000 * 1024);
-      $crawler->go();
-      $doc = new \DOMDocument();
-      libxml_use_internal_errors(true);
-      $doc->loadHTML($crawler->retreiveresults());
-      preg_match('#<span>[\d]+ [\w]+</span>#',$crawler->retreiveresults(),$mentions);
-      preg_match('#[\d]+#',$mentions[0],$mentions);
-      $this->portalcounter['klix'] += $mentions[0];
-      //var_dump($this->portalcounter['klix']);
-      //preg_match('/[\d]+/',$crawler->retreiveresults(),$mentions);
-      $xpath = new \DOMXpath($doc);
-      $articles = $xpath->query('//div[@class="news-line row"]');
-      // all links in .news-line row
-      $links = array();
-      foreach($articles as $container) {
-        $arr = $container->getElementsByTagName("a");
-        foreach($arr as $item) {
-          $href =  $item->getAttribute("href");
-          $href="http://www.klix.ba".$href;
-          $textcode=$doc->saveHTML($item);
-          preg_match('/<h1>(.*?)<\/h1>/s', $textcode, $text);
-          $links[] = array(
-            'url' => $href,
-            'title' => $text[1],
-            'desc' => ""
-          );
-        }
-      }
-      return $links;
-    }
-
-
-    public function searchavaz($query,$url)
-    {
-      $links=array();
-      $tempurl=$url."/pretraga/page:1?keyword=".$query;
-      $tempdoc=file_get_contents($tempurl);
-      $doc = new \DOMDocument();
-      libxml_use_internal_errors(true);
-      $doc->loadHTML($tempdoc);
-      $xpath = new \DOMXpath($doc);
-      $articles = $xpath->query('//article[@class="preview hybrid"]');
-      // all links in .news-line row
-        foreach($articles as $container) {
-          $arr = $container->getElementsByTagName("a");
-          $href =  $arr[2]->getAttribute("href");
-          $href="http://www.avaz.ba".$href;
-          $textcode=$doc->saveHTML($container);
-          preg_match('/<p>(.*?)<\/p>/s', $textcode, $desc);
-          preg_match('/<h2>(.*?)<\/h2>/s', $textcode, $title);
-          $title[1]=strip_tags($title[1]);
-          $templinks[] = array(
-            'url' => $href,
-            'title' => $title[1],
-            'desc' => $desc[1]
-          );
-        }
-      $this->portalcounter['avaz'] += count($templinks);
-
-      //This function calculates the number of result pages in the search by using binary search technique
-      $x=50; $min=2; $max=100; $numberofpages=1;
-      while(TRUE)
+      $keyword='%'.$keyword.'%';
+      if($datefrom==NULL || $dateto==NULL)
       {
-        $tempurl=$url."/pretraga/page:".$x."?keyword=".$query;
-        if (@file_get_contents($tempurl))
-        {
-          $min=$x;
-          $x=floor(($max+$x)/2);
-        }
-        else {
-          $max=$x;
-          $x=floor(($min+$x)/2);
-        }
-        if($min==$max || ($max-$min)<=1)
-        {
-          $numberofpages=$x;
-          break;
-        }
-      }
-
-      $this->portalcounter['avaz'] += (20*$numberofpages);
-
-      return $templinks;
+        $search_items=results::where('content', 'LIKE', $keyword)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','description','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
+      }else{
+      $search_items=results::where('content', 'LIKE', $keyword)
+            ->where(function ($query) use ($datefrom,$dateto)  {
+                $query->whereBetween('date', $datefrom, $dateto)
+                      ->orWhere('date', '=', NULL);
+            })->orderBy('total_shares','desc')->get(['url','portal', 'page_title','description','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
+          }
+      $fb_likes=$search_items->sum('fb_likes');
+      $fb_shares=$search_items->sum('fb_shares');
+      $fb_comments=$search_items->sum('fb_comments');
+      $gp_shares=$search_items->sum('gp_shares');
+      $total_shares=$search_items->sum('total_shares');
+      $social_stats=array('fb_likes'=>$fb_likes,'fb_shares'=>$fb_shares,'fb_comments'=>$fb_comments,'gp_shares'=>$gp_shares,'total_shares'=>$total_shares);
+      $this->update_social_count($social_stats);
+      return $search_items;
     }
 
     public function display(Request $request)
@@ -232,9 +115,10 @@ class searchController extends Controller
         //'datefrom' => 'date_format:"Y-m-d"',
         //'dateto' => 'date_format:"Y-m-d"|after:datefrom',
       //]);
+      global $social_statistics;
       $tweets="";
-      $tweetsinfo="";
       $portalsmentions="";
+      $tweetsinfo="";
       $trends="Nothing until now";
       $keyword = $request->input('keyword');
       $searchtype = $request->input('searchtype');
@@ -242,9 +126,7 @@ class searchController extends Controller
       $dateto = $request->input('dateto');
       $social1 = $request->input('social1');
       $social2 = $request->input('social2');
-      $website1 = $request->input('website1');
-      $website2 = $request->input('website2');
-      $website3 = $request->input('website3');
+      $portals = $request->input('portals');
       $trends1 = $request->input('trends1');
       $location = $request->input('location');
       //converting location to longitude and latitude for twitter search
@@ -257,21 +139,22 @@ class searchController extends Controller
       $tweetsinfo=$this->tweetsinf($tweets);
       }
 
-      $urls=array();
+      // $urls=array();
+      //
+      // if($website1!=NULL)
+      // array_push($urls,$website1);
+      // if($website2!=NULL)
+      // array_push($urls,$website2);
+      // if($website3!=NULL)
+      // array_push($urls,$website3);
 
-      if($website1!=NULL)
-      array_push($urls,$website1);
-      if($website2!=NULL)
-      array_push($urls,$website2);
-      if($website3!=NULL)
-      array_push($urls,$website3);
 
-      if($urls!=NULL && $keyword!=NULL)
+      if($keyword!=NULL && $portals!=NULL)
       {
-        $portalsmentions=$this->searchportals($keyword,$urls);
+        $portalsmentions=$this->searchportals($keyword,$datefrom,$dateto);
       }
-      $data=array('keyword'=>$keyword,'searchtype'=>$searchtype, 'datefrom'=>$datefrom,'dateto'=>$dateto, 'location'=>$location,'social1'=>$social1,'social2'=>$social2,'website1'=>$website1,'website2'=>$website2,'trends1'=>$trends1,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends,
-      'locationgeo'=>$locationgeo,'portalsresults'=>$portalsmentions,'website3'=>$website3,'portalcounter'=>$this->portalcounter);
+      $data=array('keyword'=>$keyword,'searchtype'=>$searchtype, 'datefrom'=>$datefrom,'dateto'=>$dateto, 'location'=>$location,'social1'=>$social1,'social2'=>$social2,'portals'=>$portals,'trends1'=>$trends1,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends,
+      'locationgeo'=>$locationgeo,'portalsresults'=>$portalsmentions,'social_stats'=>$social_statistics);
       return view('results',$data);
     }
 

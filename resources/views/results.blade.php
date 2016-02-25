@@ -5,8 +5,8 @@ SocialFootprint
 @stop
 
 @section('trendingportals')
-@if(($website1==NULL && $website2==NULL && $website3==NULL) || $keyword==NULL)
-<h2> Please enter a keyword to search ...</h2>
+@if($portals==NULL || $keyword==NULL)
+<h2> Please enter a keyword to search or select portals option for search ...</h2>
 @elseif($portalsresults==NULL)
 <h2>There are no matches</h2>
 @else
@@ -14,28 +14,25 @@ SocialFootprint
 <div style="display:block;">
 <h2 style="text-align:center;">Summary</h2>
 <ul style="margin-left:10%;" class="nav nav-pills" role="tablist">
-  <li role="presentation" class="active"><a href="#">Total Mentions <span class="badge">{{$portalcounter["klix"]+$portalcounter["avaz"]+$portalcounter["nezavisne"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Klix mentions <span class="badge">{{$portalcounter["klix"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Avaz mentions <span class="badge">{{$portalcounter["avaz"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Nezavisne mentions <span class="badge">{{$portalcounter["nezavisne"]}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Total Social Media Shares <span class="badge">{{$social_stats["total_shares"]}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Facebook Likes <span class="badge">{{$social_stats["fb_likes"]}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Facebook Shares <span class="badge">{{$social_stats["fb_shares"]}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Total Comments <span class="badge">{{$social_stats["fb_comments"]}}</span></a></li>
+  <li role="presentation" class="active"><a href="#">Google+ Shares <span class="badge">{{$social_stats["gp_shares"]}}</span></a></li>
 </ul>
 </div>
 
-<h2>Top results</h2>
+<h2>Top results by social shares (total results = {{$portalsresults->count()}})</h2>
 <div style='margin-left:10px'>
 @foreach ($portalsresults as $portalresult)
   @if($portalresult!=NULL)
-    @foreach ($portalresult as $result)
-    <a href='{{ $result["url"] }}'> <h4>{{ $result["title"] }}</h4></a>
-    <p style='color:green;'>{{ $result["url"] }}</p>
-    <p>{{$result["desc"]}}</p>
+    <a href='{{ $portalresult->url}}'> <h4>{{ $portalresult->page_title }}</h4></a>
+    <p style='color:green;'>{{ $portalresult->url }}</p>
+    <p>{{$portalresult->description}}</p>
     <hr style='color:border-top: 1px solid #aaaaaa;'>
-    @endforeach
   @endif
 @endforeach
 </div>
-
-
 @endif
 @stop
 
