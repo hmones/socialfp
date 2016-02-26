@@ -30,7 +30,11 @@ Social Footprint
       </br>
       <h4>Filters:</h4>
         <div class="well col-md-12" style="color:black;">
-          <h5>Social Media:</h5>
+          <p><b>Date Settings:</b> <br>(Works for Portals and Twitter)</p>
+          <input type="text" name="datefrom" class="form-control" placeholder="From (yyyy/mm/dd)" @if($datefrom!=NULL) value={{$datefrom}} @endif >
+          </br>
+          <input type="text" name="dateto" class="form-control" placeholder="To (yyyy/mm/dd)" @if($dateto!=NULL) value={{$dateto}} @endif >
+          <br><br>
           <input type="checkbox" name="social1" value="http://www.twitter.com" @if($social1!=NULL) checked @endif ><label>&nbsp;Twitter&nbsp;</label>
           {{--</br>
           <input type="checkbox" name="social2" value="http://www.facebook.com" @if($social2!=NULL) checked @endif ><label>&nbsp;Facebook&nbsp;</label>
@@ -42,19 +46,13 @@ Social Footprint
             <option value="mixed">Mixed results</option>
           </select>
           </br>
-          <input type="text" name="datefrom" class="form-control" placeholder="From (yyyy/mm/dd)" @if($datefrom!=NULL) value={{$datefrom}} @endif >
+            <input type="text" name="location" class="form-control" placeholder="Type Location" @if($location!=NULL) value="{{$location}}" @endif >
+          </br><br>
+          <input type="checkbox" name="portals" value="yes" @if($portals!=NULL) checked @endif ><label>&nbsp; Bosnian Portals&nbsp;</label>
           </br>
-          <input type="text" name="dateto" class="form-control" placeholder="To (yyyy/mm/dd)" @if($dateto!=NULL) value={{$dateto}} @endif >
-          </br>
-            <input type="text" name="location" class="form-control" placeholder="Select Location" @if($location!=NULL) value="{{$location}}" @endif >
-          </br>
-          <h5>Trending Portals</h5>
-          <input type="checkbox" name="portals" value="yes" @if($portals!=NULL) checked @endif ><label>&nbsp; Portals&nbsp;</label>
-          </br>
-          <h5>Search Engines</h5>
           <input type="checkbox" name="trends1" value="http://trends.google.com" @if($trends1!=NULL) checked @endif ><label>&nbsp; Google Trends&nbsp;</label>
-          <hr style="border-top:1px solid #972002;">
-          <button type="submit" class="btn btn-success">Apply Criteria</button>
+          <hr style="border-top:1px solid #aeaeae;">
+          <button type="submit" class="btn btn-success" style="position:relative;left:20%;">Apply Criteria</button>
         </div>
       </div>
     </form>

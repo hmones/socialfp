@@ -93,11 +93,11 @@ class searchController extends Controller
       {
         $search_items=results::where('content', 'LIKE', $keyword)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','description','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
       }else{
-      $datefrom=preg_replace('/[\/]/','-',$datefrom);
-      $dateto=preg_replace('[\/\\]','-',$dateto);
+      $datefrom=preg_replace('#\/#','-',$datefrom);
+      $dateto=preg_replace('#\/#','-',$dateto);
       $search_items=results::where('content', 'LIKE', $keyword)
             ->where(function ($query) use ($datefrom,$dateto)  {
-                $query->whereBetween('date', $datefrom, $dateto)
+                $query->whereBetween('date', [$datefrom, $dateto])
                       ->orWhere('date', '=', NULL);
             })->orderBy('total_shares','desc')->get(['url','portal', 'page_title','description','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
           }
