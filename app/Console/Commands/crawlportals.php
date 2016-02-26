@@ -50,8 +50,8 @@ class crawlportals extends Command
       //   $crawler->addContentTypeReceiveRule("#text/html#");
       //   $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png|css|js)$# i");
       Log::info('Started Crawling Now');
+      $crawler = new PHPCrawler();
       foreach ($urls as $url) {
-        $crawler = new PHPCrawler();
         $crawler->setURL($url);
         $crawler->addContentTypeReceiveRule("#text/html#");
         $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png|css|js|svg|json)# i");
