@@ -1082,13 +1082,6 @@ class PHPCrawler
   {
       $SMresults=array('gp_shares'=>0,'fb_likes'=>0,'fb_shares'=>0,'fb_comments'=>0);
 
-        //Twitter function is deprecated
-        // $json_string = file_get_contents(sprintf('http://urls.api.twitter.com/1/urls/count.json?url=%s', $url));
-        // $json = json_decode($json_string, true);
-        // if (!empty($json['count']))
-        //     return $json['count'];
-        // return 0;
-        //print('fbin');
         $context = stream_context_create(array('http' => array('ignore_errors' => true),));
         $json_string = @file_get_contents(sprintf('https://api.facebook.com/method/links.getStats?urls=%s&format=json', $url),false, $context);
         if($json_string==false || $json_string==NULL){

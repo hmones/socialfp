@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Haythameyd\PHPCrawl\PHPCrawler;
 use App\results;
 use DB;
+use Log;
 
 class crawlportals extends Command
 {
@@ -48,6 +49,7 @@ class crawlportals extends Command
       //   $crawler->setURL('http://www.avaz.ba/image_galleries/view?id=6015&article_id=221010&layout=ajax&template=article_images');
       //   $crawler->addContentTypeReceiveRule("#text/html#");
       //   $crawler->addURLFilterRule("#\.(jpg|jpeg|gif|png|css|js)$# i");
+      Log::info('Started Crawling Now');
       foreach ($urls as $url) {
         $crawler = new PHPCrawler();
         $crawler->setURL($url);
@@ -121,13 +123,13 @@ class crawlportals extends Command
 
         $crawler->enableCookieHandling(true);
         $crawler->setCrawlingDepthLimit(4);
-        $crawler->setRequestLimit(600,true);//Sets a limit to the total number of requests the crawler should execute. True is to select only successfully received documents
+        $crawler->setRequestLimit(800,true);//Sets a limit to the total number of requests the crawler should execute. True is to select only successfully received documents
         $crawler->excludeLinkSearchDocumentSections(7); //2 means comment section is excluded, 1 means the script section, 7 means all special sections
         $crawler->go();
         //$crawler->goMultiProcessed(5);
         $this->info($url.' has been crawled successfully');
         // unset($crawler);
        }
-
+       Log::info('Crawling Ended now);
     }
 }
