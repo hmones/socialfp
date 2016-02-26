@@ -130,6 +130,6 @@ class crawlportals extends Command
         $this->info($url.' has been crawled successfully');
         // unset($crawler);
        }
-       Log::info('Crawling Ended now);
+       Log::info('Crawling Ended now');
     }
 }
