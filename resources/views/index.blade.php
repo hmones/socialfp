@@ -7,7 +7,7 @@ Social Footprint
 @section('content')
     <div class="row" style="color:white;">
       <form class="screen-centered" action="search" method="get">
-        <h2 align="center"> SocialFootprint </h2>
+        <h2 align="center" style="font-family: 'Lobster', cursive;"> SocialFootprint </h2>
       </br>
         <div class="input-group">
         <input type="text" name="keyword" class="form-control" placeholder="Search for...">

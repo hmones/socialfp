@@ -42,8 +42,8 @@ class crawlportals extends Command
     public function handle()
     {
 
-      //$urls=array('ba.n1info.com','www.glassrpske.com','www.faktor.ba','www.cazin.net','www.biscani.net','www.vecernji.ba','www.avaz.ba','www.abc.ba');
-      $urls=array('www.klix.ba','www.ekskluziva.ba','balkans.aljazeera.net','www.radiosarajevo.ba','www.nezavisne.com','www.bljesak.info','www.fokus.ba','www.sportsport.ba','www.novi.ba','www.vijesti.ba','www.depo.ba','www.source.ba','www.bh-index.com','www.oslobodjenje.ba','www.krajina.ba','www.haber.ba','www.buka.com','www.hayat.ba','ba.n1info.com','www.glassrpske.com','www.faktor.ba','www.cazin.net','www.biscani.net','www.vecernji.ba','www.avaz.ba','www.abc.ba');
+      $urls=array('www.bljesak.info');
+      //$urls=array('www.klix.ba','www.ekskluziva.ba','balkans.aljazeera.net','www.radiosarajevo.ba','www.nezavisne.com','www.bljesak.info','www.fokus.ba','www.sportsport.ba','www.novi.ba','www.vijesti.ba','www.depo.ba','www.source.ba','www.bh-index.com','www.oslobodjenje.ba','www.krajina.ba','www.haber.ba','www.buka.com','www.hayat.ba','ba.n1info.com','www.glassrpske.com','www.faktor.ba','www.cazin.net','www.biscani.net','www.vecernji.ba','www.avaz.ba','www.abc.ba');
 
       // $crawler = new PHPCrawler();
       //   $crawler->setURL('http://www.avaz.ba/image_galleries/view?id=6015&article_id=221010&layout=ajax&template=article_images');

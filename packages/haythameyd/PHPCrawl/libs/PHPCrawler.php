@@ -1253,9 +1253,12 @@ class PHPCrawler
 
             if($container!=NULL)
             {
-              $container=preg_replace('/[Čč]/','c',$container->plaintext);
-              $container=preg_replace('/[Žž]/','z',$container);
+              $container=preg_replace('/(Č|č)/','c',$container->plaintext);
+              print($container.'||');
+              $container=preg_replace('/(Ž|ž)/','z',$container);
+              print($container.'||');
               $container=preg_replace('/\w+: \w+, /',"",$container);
+              print($container.'||');
               $dayyear=preg_replace('/[^0-9]/',"",$container);
               $day=substr($dayyear,0,2);
               $year=substr($dayyear,2,4);

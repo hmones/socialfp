@@ -5,10 +5,15 @@ SocialFootprint
 @stop
 
 @section('trendingportals')
-@if($portals==NULL || $keyword==NULL)
-<h2> Please enter a keyword to search or select portals option for search ...</h2>
+@if($portals==NULL)
+<p align=center><span class="glyphicon glyphicon-check" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+<h3 align="center"> Please select trending portals' checkbox first to perform search</h3>
+@elseif($keyword==NULL)
+<p align=center><span class="glyphicon glyphicon-alert" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+<h3 align="center"> Please type a valid keyword to search portals</h3>
 @elseif($portalsresults==NULL)
-<h2>There are no matches</h2>
+<p align=center><span class="glyphicon glyphicon-keyword" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+<h3 align="center">There are no matches</h3>
 @else
 
 <div style="display:block;">
@@ -38,7 +43,11 @@ SocialFootprint
 
 @section('googletrends')
 @if($trends1==NULL)
-  <h2> Please enter a keyword to search ... </h2>
+<p align=center><span class="glyphicon glyphicon-check" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+  <h3 align="center"> Please select GoogleTrends' checkbox first to perform search </h3>
+@elseif($keyword==NULL)
+  <p align=center><span class="glyphicon glyphicon-alert" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+    <h3 align="center"> Please type a valid keyword to display Google Trends </h3>
 @else
 <div style="display:block;margin-left: 20%;">
 <h2>Interest in the Keyword over time</h2>
@@ -55,8 +64,15 @@ SocialFootprint
 
 @section('socialmedia')
 
-@if(($tweets==NULL)||$social1==NULL||$keyword==NULL)
-  <h2> Please enter a keyword to search ... </h2>
+@if($social1==NULL)
+<p align=center><span class="glyphicon glyphicon-check" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+  <h3 align="center"> Please select Twitter's checkbox first to perform search</h3>
+@elseif($keyword==NULL)
+<p align=center><span class="glyphicon glyphicon-alert" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+  <h3 align="center"> Please type a valid keyword to display Twitter results </h3>
+@elseif($tweets==NULL)
+<p align=center><span class="glyphicon glyphicon-search" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+  <h3 align="center"> There are no tweets matching your search settings </h3>
 @else
 <div style="display:block;">
 <h2 style="text-align:center;"> Summary </h2>

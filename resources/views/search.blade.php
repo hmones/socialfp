@@ -67,12 +67,12 @@ Social Footprint
   It uses a function search site from the search php file
 
   -->
-  <div class="col-md-8" style="background-color: rgba(255, 255, 255, 0.85);border-radius: 10px;margin-top:20px;">
+  <div class="col-md-9" style="background-color: rgba(255, 255, 255, 0.85);border-radius: 10px;margin-top:20px;">
     <div>
 
       <!-- Nav tabs -->
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#socialmedia" aria-controls="home" role="tab" data-toggle="tab">Social Media</a></li>
+      <ul class="nav nav-tabs" role="tablist" style="background-color:#fff;">
+        <li role="presentation"><a href="#socialmedia" aria-controls="home" role="tab" data-toggle="tab">Social Media</a></li>
         <li role="presentation"><a href="#trendingportals" aria-controls="profile" role="tab" data-toggle="tab">Trending Portals</a></li>
         <li role="presentation"><a href="#googletrends" aria-controls="messages" role="tab" data-toggle="tab">Google Trends</a></li>
       </ul>
