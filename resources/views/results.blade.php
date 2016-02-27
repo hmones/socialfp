@@ -17,22 +17,22 @@ SocialFootprint
 @else
 
 <div style="display:block;">
-<h2 style="text-align:center;font-family: 'Lobster', cursive;">Statistics</h2>
+<h1 style="text-align:center;font-family: 'Lobster', cursive;">Statistics for "{{$keyword}}"</h1>
 
 
-<div class="col-md-3"><p align=center><span class="glyphicon glyphicon-alert" style="font-size:30px;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["fb_likes"]}} </span></br>Facebook Likes </p></div>
-<div class="col-md-3"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["fb_shares"]}}</span></br> Facebook Shares </p></div>
-<div class="col-md-3"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["fb_comments"]}}</span></br> Total Comments </p></div>
-<div class="col-md-3"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["gp_shares"]}}</span></br> Google+ Shares </p></div>
-<div class="col-md-12"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["total_shares"]}}</span></br> Total Social Media Shares </p></div>
+<div class="col-md-3"><p align=center><span class="glyphicon glyphicon-thumbs-up" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["fb_likes"]}} </span></br>Facebook Likes </p></div>
+<div class="col-md-3"><p align=center><span class="glyphicon glyphicon-share-alt" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["fb_shares"]}}</span></br> Facebook Shares </p></div>
+<div class="col-md-3"><p align=center><span class="glyphicon glyphicon-comment" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["fb_comments"]}}</span></br> Total Comments </p></div>
+<div class="col-md-3"><p align=center><span class="glyphicon glyphicon-plus" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["gp_shares"]}}</span></br> Google+ Shares </p></div>
+<div class="col-md-12"><p align=center><span class="glyphicon glyphicon-globe" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["total_shares"]}}</span></br> Total Social Media Shares </p></div>
 
 </div>
 </br>
 </br>
 
 <div style='col-md-12 margin-left:10px'>
-  <hr style="border-top:1px solid #aeaeae;">
-  <h2>Top results sorted by socialmedia shares (Total: {{$portalsresults->count()}})</h2>
+</br>
+  <h2 style="font-family: 'Lobster', cursive;">Top results sorted by socialmedia shares (Total: {{$portalsresults->count()}})</h2>
 @foreach ($portalsresults as $portalresult)
   @if($portalresult!=NULL)
     <a href='{{ $portalresult->url}}'> <h4>{{ $portalresult->page_title }}</h4></a>
@@ -79,22 +79,14 @@ SocialFootprint
   <h3 align="center"> There are no tweets matching your search settings </h3>
 @else
 <div style="display:block;">
-<h2 style="text-align:center;"> Summary </h2>
+<h1 style="text-align:center;font-family: 'Lobster', cursive;"> Statistics for "{{$keyword}}"</h1>
 
-<div style="text-align:center;">
-<span class="glyphicon glyphicon-retweet" style="font-size:60px;text-align:center;color:#3C763D;">&nbsp;&nbsp;&nbsp;</span>
-<span class="glyphicon glyphicon-heart-empty" style="font-size:60px;text-align:center;color:#A94442;">&nbsp;&nbsp;&nbsp;</span>
-<span class="glyphicon glyphicon-flash" style="font-size:60px;text-align:center;color:#337AB7;"></span>
-</div>
-<br>
+<div class="col-md-4"><p align=center><span class="glyphicon glyphicon-retweet" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$tweets_info['0']}} </span></br>Retweets and Shares </p></div>
+<div class="col-md-4"><p align=center><span class="glyphicon glyphicon-heart-empty" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$tweets_info['1']}}</span></br> Favourites and Likes </p></div>
+<div class="col-md-4"><p align=center><span class="glyphicon glyphicon-flash" style="font-size:50px;color:#2E86BC;"></span></br><span class="badge" style="font-size:30px;">{{$tweets_info['3']}}</span></br> Mentions by influential users </p></div>
 
-<ul style="margin-left:10%;" class="nav nav-pills" role="tablist">
-  <li role="presentation" class="active"><a href="#">Retweets and Shares <span class="badge">{{$tweets_info['0']}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Favourites and Likes <span class="badge">{{$tweets_info['1']}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Mentions by influential users <span class="badge">{{$tweets_info['3']}}</span></a></li>
-</ul>
 </div>
-<h2> Statuses </h2>
+<h2 style="font-family: 'Lobster', cursive;"> Statuses </h2>
 {{--<h3>{{$tweets->search_metadata->refresh_url}}</h3>--}}
 @foreach ($tweets->statuses as $tweet)
     <p><img src="{{ asset('img/t.png') }}" width=20px>&nbsp;&nbsp;<span style="color:#A62400">{{ $tweet->user->name }}</span>: {{ $tweet->text }}</p>
