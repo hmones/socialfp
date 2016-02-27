@@ -1223,7 +1223,7 @@ class PHPCrawler
               $year=substr($dayyear,2,4);
               $month=preg_replace("/[^A-z]/","",$container);
               $month=substr($month,0, -1);
-              $month=$months_trans[$month];
+              $month=@$months_trans[$month];
               $result->date=$year.'-'.$month.'-'.$day;
               $result->isArticle=true;
             }
@@ -1263,7 +1263,7 @@ class PHPCrawler
               $day=substr($dayyear,0,2);
               $year=substr($dayyear,2,4);
               $month=preg_replace("/[0-9\s\.:]/","",$container);
-              $month=$months_trans_CR[$month];
+              $month=@$months_trans_CR[$month];
               $result->date=$year.'-'.$month.'-'.$day;
               $result->isArticle=true;
             }
@@ -1360,7 +1360,7 @@ class PHPCrawler
               if(strlen($day)==1)$day='0'.$day;
               $year=date('Y');
               $month=preg_replace('/[^A-z]/',"",$container->plaintext);
-              $result->date=$year.'-'.$months_trans_EN[$month].'-'.$day;
+              $result->date=$year.'-'.@$months_trans_EN[$month].'-'.$day;
               $result->isArticle=true;
             }
           }

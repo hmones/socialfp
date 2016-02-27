@@ -17,18 +17,22 @@ SocialFootprint
 @else
 
 <div style="display:block;">
-<h2 style="text-align:center;">Summary</h2>
-<ul style="margin-left:10%;" class="nav nav-pills" role="tablist">
-  <li role="presentation" class="active"><a href="#">Total Social Media Shares <span class="badge">{{$social_stats["total_shares"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Facebook Likes <span class="badge">{{$social_stats["fb_likes"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Facebook Shares <span class="badge">{{$social_stats["fb_shares"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Total Comments <span class="badge">{{$social_stats["fb_comments"]}}</span></a></li>
-  <li role="presentation" class="active"><a href="#">Google+ Shares <span class="badge">{{$social_stats["gp_shares"]}}</span></a></li>
-</ul>
-</div>
+<h2 style="text-align:center;font-family: 'Lobster', cursive;">Statistics</h2>
 
-<h2>Top results by social shares (total results = {{$portalsresults->count()}})</h2>
-<div style='margin-left:10px'>
+
+<div class="col-md-3"><p align=center><span class="glyphicon glyphicon-alert" style="font-size:30px;"></span></br><span class="badge" style="font-size:30px;">{{$social_stats["fb_likes"]}} </span></br>Facebook Likes </p></div>
+<div class="col-md-3"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["fb_shares"]}}</span></br> Facebook Shares </p></div>
+<div class="col-md-3"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["fb_comments"]}}</span></br> Total Comments </p></div>
+<div class="col-md-3"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["gp_shares"]}}</span></br> Google+ Shares </p></div>
+<div class="col-md-12"><p align=center><span class="badge" style="font-size:30px;">{{$social_stats["total_shares"]}}</span></br> Total Social Media Shares </p></div>
+
+</div>
+</br>
+</br>
+
+<div style='col-md-12 margin-left:10px'>
+  <hr style="border-top:1px solid #aeaeae;">
+  <h2>Top results sorted by socialmedia shares (Total: {{$portalsresults->count()}})</h2>
 @foreach ($portalsresults as $portalresult)
   @if($portalresult!=NULL)
     <a href='{{ $portalresult->url}}'> <h4>{{ $portalresult->page_title }}</h4></a>
