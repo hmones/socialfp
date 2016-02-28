@@ -14,7 +14,7 @@ class CreateResultsTable extends Migration
     {
       Schema::create('results', function (Blueprint $table) {
           $table->increments('id');
-          $table->char('url',255)->unique();
+          $table->char('url',255);
           $table->char('portal',50);
           $table->char('page_title',255);
           $table->text('description')->nullable();
