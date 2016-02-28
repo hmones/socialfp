@@ -1459,7 +1459,7 @@ class PHPCrawler
             $result->gp_shares=$socialshares['gp_shares'];
             $result->total_shares=$socialshares['fb_likes']+$socialshares['fb_shares']+$socialshares['fb_comments']+$socialshares['gp_shares'];
           }
-          $result->save();
+          @$result->save();
 
       }
     }elseif($pagehtml==false)

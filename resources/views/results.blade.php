@@ -32,16 +32,18 @@ SocialFootprint
 
 <div style='col-md-12 margin-left:10px'>
 </br>
+<hr style='border-top: 1px solid #aeaeae;'>
   <h2 style="font-family: 'Lobster', cursive;">Top results sorted by socialmedia shares (Total: {{$portalsresults->count()}})</h2>
 @foreach ($portalsresults as $portalresult)
   @if($portalresult!=NULL)
     <a href='{{ $portalresult->url}}'> <h4>{{ $portalresult->page_title }}</h4></a>
     <p style='color:green;'>{{ $portalresult->url }}</p>
-    <p>{{$portalresult->description}}</p>
-    <hr style='color:border-top: 1px solid #aaaaaa;'>
+    {{--<p>{{$portalresult->description}}</p>--}}
+    <hr style='border-top: 1px solid #aeaeae;'>
   @endif
 @endforeach
 </div>
+
 @endif
 @stop
 
@@ -54,13 +56,13 @@ SocialFootprint
     <h3 align="center"> Please type a valid keyword to display Google Trends </h3>
 @else
 <div style="display:block;margin-left: 20%;">
-<h2>Interest in the Keyword over time</h2>
+<h2 style="font-family: 'Lobster', cursive;">Interest in the Keyword "{{$keyword}}" over time</h2>
   <script type="text/javascript" src="//www.google.com/trends/embed.js?hl=en-US&q={{ $keyword }}&cmpt=q&tz=Etc/GMT-1&tz=Etc/GMT-1&content=1&cid=TIMESERIES_GRAPH_0&export=5&w=500&h=330"></script>
 </div>
 <div style="display:block;margin-left: 20%;">
-<h2>Interest in the Keyword over countries/regions</h2>
+<h2 style="font-family: 'Lobster', cursive;">Interest in the Keyword "{{$keyword}}" over countries/regions</h2>
 <script style="position: absolute;top: 50%;left: 50%;margin-top: -50px; margin-left: -50px;" type="text/javascript" src="//www.google.com/trends/embed.js?hl=en-US&q={{ $keyword }}&cmpt=q&tz=Etc/GMT-1&tz=Etc/GMT-1&content=1&cid=GEO_TABLE_0_0&export=5&w=500&h=450"></script>
-<h2>Related searches</h2>
+<h2 style="font-family: 'Lobster', cursive;">Related searches to "{{$keyword}}"</h2>
 <script style="position: absolute;top: 50%;left: 50%;margin-top: -50px; margin-left: -50px;" type="text/javascript" src="//www.google.com/trends/embed.js?hl=en-US&q={{ $keyword }}&cmpt=q&tz=Etc/GMT-1&tz=Etc/GMT-1&content=1&cid=TOP_QUERIES_0_0&export=5&w=500&h=450"></script>
 </div>
 @endif

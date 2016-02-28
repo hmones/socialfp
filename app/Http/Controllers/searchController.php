@@ -91,7 +91,7 @@ class searchController extends Controller
       $keyword='%'.$keyword.'%';
       if($datefrom==NULL || $dateto==NULL)
       {
-        $search_items=results::where('content', 'LIKE', $keyword)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','description','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
+        $search_items=results::where('content', 'LIKE', $keyword)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
       }else{
       $datefrom=preg_replace('#\/#','-',$datefrom);
       $dateto=preg_replace('#\/#','-',$dateto);
@@ -99,7 +99,7 @@ class searchController extends Controller
             ->where(function ($query) use ($datefrom,$dateto)  {
                 $query->whereBetween('date', [$datefrom, $dateto])
                       ->orWhere('date', '=', NULL);
-            })->orderBy('total_shares','desc')->get(['url','portal', 'page_title','description','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
+            })->orderBy('total_shares','desc')->get(['url','portal', 'page_title','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
           }
       $fb_likes=$search_items->sum('fb_likes');
       $fb_shares=$search_items->sum('fb_shares');
