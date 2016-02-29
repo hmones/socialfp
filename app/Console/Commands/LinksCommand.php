@@ -3,16 +3,16 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\SitemapGenerator;
+use App\LinksExtractor;
 
-class SitemapCommand extends Command
+class LinksCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'sitemap {url}';
+    protected $signature = 'links:extract {url}';
 
     /**
      * The console command description.
@@ -38,7 +38,11 @@ class SitemapCommand extends Command
      */
     public function handle()
     {
-        $urls = SitemapGenerator::start($this->argument('url'),[],10);
-        dd($urls);
+        $urls = LinksExtractor::start($this->argument('url'),
+        ['http://www.radiosarajevo.ba/home/kategorija/1','http://www.radiosarajevo.ba/home/kategorija/212']
+        ,10);
+        foreach($urls as $url){
+            echo $url . "\n";
+        }
     }
 }

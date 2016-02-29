@@ -10,7 +10,7 @@ use \Spatie\Crawler\CrawlProfile;
 
 use Log;
 
-class SitemapGenerator
+class LinksExtractor
 {
     public static function start($url, array $skipUrls = [], $limit = 100)
     {
@@ -43,7 +43,7 @@ class UrlSkipper implements CrawlProfile{
     public function shouldCrawl(Url $url){
 
         if(!$this->isInside($url)) return FALSE; //crawl same host only
-        if($this->shouldSkip()) return FALSE;
+        if($this->shouldSkip($url)) return FALSE;
         if($this->exceedLimit()) return FALSE;
 
         return TRUE;
@@ -59,12 +59,15 @@ class UrlSkipper implements CrawlProfile{
     }
 
 
-    private function shouldSkip(){
+    private function shouldSkip($url){
         if(empty($this->skipUrls)) return FALSE; //nothing to skip
 
-        $found = in_array($url, $this->skipUrls);
 
-        if($found !== FLASE){
+        $found = in_array($url, $this->skipUrls);
+        // dd($found !== false);
+
+        if($found !== FALSE){
+            echo "-- $url \n";
             Log::debug('Skipping URL: '. $url);
             return TRUE;
         }
@@ -90,7 +93,7 @@ class UrlCrawler implements CrawlObserver
     public function willCrawl(Url $url)
     {
         $this->limit--;
-        echo "$this->limit " . $url . "\n";
+        // echo "$this->limit " . $url . "\n";
         array_push($this->urls, $url);
     }
 

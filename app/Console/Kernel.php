@@ -13,8 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\Scrapper::class,
-        Commands\SitemapCommand::class,
+        Commands\LinksCommand::class,
         Commands\crawlportals::class
     ];
 
