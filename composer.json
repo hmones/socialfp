@@ -10,7 +10,9 @@
         "twbs/bootstrap": "^3.3",
         "abraham/twitteroauth": "^0.6.2",
         "fabpot/goutte": "^3.1",
-        "simple-html-dom/simple-html-dom": "^1.5"
+        "simple-html-dom/simple-html-dom": "^1.5",
+        "mmerian/phpcrawl": "^0.8.3",
+        "spatie/crawler": "^1.2"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
