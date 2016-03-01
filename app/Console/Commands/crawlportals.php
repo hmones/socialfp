@@ -124,7 +124,7 @@ class crawlportals extends Command
 
         $crawler->enableCookieHandling(true);
         $crawler->setCrawlingDepthLimit(4);
-        $crawler->setRequestLimit(600,true);//Sets a limit to the total number of requests the crawler should execute. True is to select only successfully received documents
+        $crawler->setRequestLimit(500,true);//Sets a limit to the total number of requests the crawler should execute. True is to select only successfully received documents
         $crawler->excludeLinkSearchDocumentSections(7); //2 means comment section is excluded, 1 means the script section, 7 means all special sections
         $crawler->go();
         //$crawler->goMultiProcessed(5);

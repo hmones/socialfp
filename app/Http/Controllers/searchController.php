@@ -86,12 +86,12 @@ class searchController extends Controller
       $social_statistics['total_shares']=$social_stats['total_shares'];
     }
 
-    public function searchportals ($keyword,$datefrom,$dateto)
+    public function searchportals ($keyword,$datefrom,$dateto,$portal)
     {
       $keyword='%'.$keyword.'%';
       if($datefrom==NULL || $dateto==NULL)
       {
-        $search_items=results::where('content', 'LIKE', $keyword)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
+        $search_items=results::where('content', 'LIKE', $keyword)->whereIn('portal',$portal)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
       }else{
       $datefrom=preg_replace('#\/#','-',$datefrom);
       $dateto=preg_replace('#\/#','-',$dateto);
@@ -99,7 +99,7 @@ class searchController extends Controller
             ->where(function ($query) use ($datefrom,$dateto)  {
                 $query->whereBetween('date', [$datefrom, $dateto])
                       ->orWhere('date', '=', NULL);
-            })->orderBy('total_shares','desc')->get(['url','portal', 'page_title','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
+            })->whereIn('portal',$portal)->orderBy('total_shares','desc')->get(['url','portal', 'page_title','date','fb_likes','fb_shares','fb_comments','gp_shares','total_shares']);
           }
       $fb_likes=$search_items->sum('fb_likes');
       $fb_shares=$search_items->sum('fb_shares');
@@ -131,9 +131,12 @@ class searchController extends Controller
       $portals = $request->input('portals');
       $trends1 = $request->input('trends1');
       $location = $request->input('location');
+      $portal = $request->input('portal');
+      $portals=$request->input('portals');
+
+      if($portal==NULL){$portal=array('Nothing');}
       //converting location to longitude and latitude for twitter search
       $locationgeo = $this->getLongLat($request->input('location'));
-
 
       if($keyword!=NULL && $social1!=NULL)
       {
@@ -151,12 +154,16 @@ class searchController extends Controller
       // array_push($urls,$website3);
 
 
-      if($keyword!=NULL && $portals!=NULL)
+      if($keyword!=NULL && ($portal!=NULL || $portals=='yes'))
       {
-        $portalsmentions=$this->searchportals($keyword,$datefrom,$dateto);
+        if($portals=='yes')
+        {
+          $portal=array('www.klix.ba','www.ekskluziva.ba','balkans.aljazeera.net','www.radiosarajevo.ba','www.nezavisne.com','www.bljesak.info','www.fokus.ba','www.sportsport.ba','www.novi.ba','www.vijesti.ba','www.depo.ba','www.source.ba','www.bh-index.com','www.oslobodjenje.ba','www.krajina.ba','www.haber.ba','www.buka.com','www.hayat.ba','ba.n1info.com','www.glassrpske.com','www.faktor.ba','www.cazin.net','www.biscani.net','www.vecernji.ba','www.avaz.ba','www.abc.ba');
+        }
+        $portalsmentions=$this->searchportals($keyword,$datefrom,$dateto,$portal);
       }
       $data=array('keyword'=>$keyword,'searchtype'=>$searchtype, 'datefrom'=>$datefrom,'dateto'=>$dateto, 'location'=>$location,'social1'=>$social1,'social2'=>$social2,'portals'=>$portals,'trends1'=>$trends1,'tweets'=>$tweets,'tweets_info'=>$tweetsinfo,'trends'=>$trends,
-      'locationgeo'=>$locationgeo,'portalsresults'=>$portalsmentions,'social_stats'=>$social_statistics);
+      'locationgeo'=>$locationgeo,'portalsresults'=>$portalsmentions,'social_stats'=>$social_statistics,'portal'=>$portal);
       return view('results',$data);
     }
 

@@ -8,3 +8,20 @@
     transform: translate(-50%, -50%);
     width:30%;
   }
+
+  .portalselect{
+    height: 480px;
+    width: 180px;
+    align-content: center;
+    padding-left: 20px;
+    padding-top: 10px;
+    border-color: #2E86BC;
+    border-radius: 15px;
+    overflow: hidden;
+    padding-bottom: 10px;
+
+  }
+
+  select[multiple]{
+    height:470px;
+  }

@@ -5,14 +5,14 @@ SocialFootprint
 @stop
 
 @section('trendingportals')
-@if($portals==NULL)
+{{--@if($portal==NULL)
 <p align=center><span class="glyphicon glyphicon-check" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
-<h3 align="center"> Please select trending portals' checkbox first to perform search</h3>
-@elseif($keyword==NULL)
+<h3 align="center"> Please select trending portals' checkbox first to perform search</h3>--}}
+@if($keyword==NULL)
 <p align=center><span class="glyphicon glyphicon-alert" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
 <h3 align="center"> Please type a valid keyword to search portals</h3>
 @elseif($portalsresults==NULL)
-<p align=center><span class="glyphicon glyphicon-keyword" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
+<p align=center><span class="glyphicon glyphicon-search" style="font-size:60px;text-align:center;color:#2E86BC;"></span></p>
 <h3 align="center">There are no matches</h3>
 @else
 
