@@ -48,17 +48,25 @@ class CrawlerJob extends Job implements ShouldQueue
             return;
         }
 
+        /** check if already processed in this session */
         if ($this->alreadyProcessed($this->url)) {
-            Log::debug('Alread Processed ' . $this->url);
+            Log::debug('Already Processed ' . $this->url);
             return;
         }
+
+        $exists = $this->alreadyStored($this->url);
 
         $scrapper = new Scrapper();
         $parser = $scrapper->scrap($this->url);
         $crawler = $scrapper->crawler();
 
         if ($parser->isArticle() && $parser->date() != null) {
-            $this->savePage($parser);
+            if ($exists) {
+                $this->updatePage($parser);
+            } else {
+                $this->savePage($parser);
+            }
+
         }
 
         $this->markAsProcessed($this->url);
@@ -79,6 +87,27 @@ class CrawlerJob extends Job implements ShouldQueue
             return true;
         }
         return false;
+    }
+
+    public function alreadyStored($url)
+    {
+        $urls = $this->getSavedLinkes();
+        if (in_array((string) $url, $urls)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getSavedLinkes($url)
+    {
+        $url = Url::create();
+        $storedLinks = Cache::remember('PORTAL_' . $url->host, 10, function () use ($url) {
+            return DB::select('select url from results where portal = ?', [$url->host]);
+        });
+
+        Log::debug('Found ' . count($storedLinks) . ' stored pages for Portal ' . $url->host);
+        return $storedLinks;
+
     }
 
     public function markAsProcessed($url)
@@ -102,6 +131,22 @@ class CrawlerJob extends Job implements ShouldQueue
         $result->description = $parser->description();
         $result->portal = Url::create($this->url)->host;
         //$result->last_update = date("Y/m/d h:i:s");
+
+        $socialshares = $parser->social();
+        $result->fb_likes = $socialshares['fb_likes'];
+        $result->fb_shares = $socialshares['fb_shares'];
+        $result->fb_comments = $socialshares['fb_comments'];
+        $result->gp_shares = $socialshares['gp_shares'];
+        $result->total_shares = $socialshares['fb_likes'] + $socialshares['fb_shares'] + $socialshares['fb_comments'] + $socialshares['gp_shares'];
+
+        $result->save();
+    }
+
+    public function updatePage($parser)
+    {
+        Log::debug('Updating parsed Url ' . $this->url);
+
+        $result = Result::get('url', $this->url);
 
         $socialshares = $parser->social();
         $result->fb_likes = $socialshares['fb_likes'];
@@ -143,13 +188,13 @@ class CrawlerJob extends Job implements ShouldQueue
             });
     }
 
-    /**
-     * Normalize the given url.
-     *
-     * @param \Spatie\Crawler\Url $url
-     *
-     * @return $this
-     */
+/**
+ * Normalize the given url.
+ *
+ * @param \Spatie\Crawler\Url $url
+ *
+ * @return $this
+ */
     public function normalizeUrl(Url $url)
     {
         $baseUrl = Url::create($this->url);
