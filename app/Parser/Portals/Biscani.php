@@ -6,11 +6,6 @@ use App\Parser\ContentParser;
 class Biscani extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
-
 
     function date()
     {
@@ -28,11 +23,6 @@ class Biscani extends ContentParser
         }
 
         return $date;
-    }
-
-    function shares()
-    {
-        return "shares";
     }
 
 }

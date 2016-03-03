@@ -6,12 +6,6 @@ use App\Parser\ContentParser;
 class Avaz extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
-
-
     function date()
     {
         $date = null;
@@ -22,11 +16,6 @@ class Avaz extends ContentParser
         }
 
         return $date;
-    }
-
-    function shares()
-    {
-        return "shares";
     }
 
 }

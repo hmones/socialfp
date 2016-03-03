@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class results extends Model
+class Result extends Model
 {
      protected $table = 'results';
      public $timestamps = false;

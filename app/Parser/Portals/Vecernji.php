@@ -6,17 +6,14 @@ use App\Parser\ContentParser;
 class Vecernji extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
+
 
     public function date()
     {
         $date = null;
         $selectors = [
             'article header aside[class="article_author_detail"] p[class=meta]',
-            'header[class=detail_head cf] div["class=top cf"] aside[class=meta] p'
+            'header[class="detail_head cf"] div[class="top cf"] aside[class=meta] p'
         ];
 
         foreach($selectors as $selector){
@@ -36,15 +33,7 @@ class Vecernji extends ContentParser
                 break;
             }
         }
-
-
-
         return $date;
-    }
-
-    public function shares()
-    {
-        return "shares";
     }
 
 }

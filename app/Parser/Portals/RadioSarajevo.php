@@ -6,10 +6,7 @@ use App\Parser\ContentParser;
 class RadioSarajevo extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
+
 
     public function date()
     {
@@ -25,13 +22,6 @@ class RadioSarajevo extends ContentParser
         }
 
         return $date;
-    }
-
-
-
-    public function shares()
-    {
-        return "shares";
     }
 
 }

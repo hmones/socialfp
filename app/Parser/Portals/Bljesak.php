@@ -6,11 +6,6 @@ use App\Parser\ContentParser;
 class Bljesak extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
-
     public function date()
     {
 
@@ -29,10 +24,4 @@ class Bljesak extends ContentParser
 
         return $date;
     }
-
-    public function shares()
-    {
-        return "shares";
-    }
-
 }

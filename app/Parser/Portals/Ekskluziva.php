@@ -6,11 +6,6 @@ use App\Parser\ContentParser;
 class Ekskluziva extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
-
 
     function date()
     {
@@ -23,11 +18,6 @@ class Ekskluziva extends ContentParser
         }
 
         return $date;
-    }
-
-    function shares()
-    {
-        return "shares";
     }
 
 }

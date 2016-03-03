@@ -5,12 +5,6 @@ use App\Parser\ContentParser;
 
 class Aljazeera extends ContentParser
 {
-
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
-
     public function date()
     {
 
@@ -37,9 +31,5 @@ class Aljazeera extends ContentParser
         return $date;
     }
 
-    public function shares()
-    {
-        return "shares";
-    }
 
 }

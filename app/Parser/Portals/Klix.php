@@ -6,12 +6,6 @@ use App\Parser\ContentParser;
 class Klix extends ContentParser
 {
 
-    public function __construct($crawler)
-    {
-        parent::__construct($crawler);
-    }
-
-
     function date()
     {
         $date = null;
@@ -25,11 +19,6 @@ class Klix extends ContentParser
         }
 
         return $date;
-    }
-
-    function shares()
-    {
-        return "shares";
     }
 
 }

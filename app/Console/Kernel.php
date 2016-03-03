@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\LinksCommand::class,
+        Commands\ScrapperCommand::class,
         Commands\crawlportals::class
     ];
 
