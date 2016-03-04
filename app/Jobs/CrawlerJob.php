@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Log;
 use Spatie\Crawler\Url;
+use DB;
 
 class CrawlerJob extends Job implements ShouldQueue
 {
@@ -91,7 +92,7 @@ class CrawlerJob extends Job implements ShouldQueue
 
     public function alreadyStored($url)
     {
-        $urls = $this->getSavedLinkes();
+        $urls = $this->getSavedLinkes($url);
         if (in_array((string) $url, $urls)) {
             return true;
         }
@@ -100,7 +101,7 @@ class CrawlerJob extends Job implements ShouldQueue
 
     public function getSavedLinkes($url)
     {
-        $url = Url::create();
+        $url = Url::create($url);
         $storedLinks = Cache::remember('PORTAL_' . $url->host, 10, function () use ($url) {
             return DB::select('select url from results where portal = ?', [$url->host]);
         });
