@@ -19,6 +19,7 @@ class CrawlerJob extends Job implements ShouldQueue
 
     private $url;
     private $depth;
+    const SESSION_TIMEOUT = 60;
 
     /**
      * Create a new job instance.
@@ -31,32 +32,25 @@ class CrawlerJob extends Job implements ShouldQueue
         $this->depth = $depth;
     }
 
-    /**
-     * - check Url againest cache
-     * - crawl and parse
-     * - check if article
-     * - save in database
-     * - get all links and check if crowled before
-     * - disbatch each as job
-     *
-     * @return void
-     */
     public function handle()
     {
 
         if ($this->depth < 0) {
-            Log::debug('Depth of process reached the allowed limit. Terminating');
+            Log::debug('Depth of process reached the allowed limit. Terminating...');
             return;
         }
 
-        /** check if already processed in this session */
+        /** check if already processed in this session (60 Minutes) */
         if ($this->alreadyProcessed($this->url)) {
             Log::debug('Already Processed ' . $this->url);
             return;
         }
 
+        /** Alread extracted and stored **/
         $exists = $this->alreadyStored($this->url);
 
+
+        /** start scrapping **/
         $scrapper = new Scrapper();
         $parser = $scrapper->scrap($this->url);
         $crawler = $scrapper->crawler();
@@ -70,12 +64,11 @@ class CrawlerJob extends Job implements ShouldQueue
 
         }
 
+        /** save in this session cahse for 60 minutes **/
         $this->markAsProcessed($this->url);
         if ($this->depth > 0) {
 
             $allLinks = $this->getAllLinks($crawler);
-            Log::debug('Getting all Urls ' . count($allLinks));
-
             $this->crawlAllLinks($allLinks);
         }
 
@@ -102,11 +95,14 @@ class CrawlerJob extends Job implements ShouldQueue
     public function getSavedLinkes($url)
     {
         $url = Url::create($url);
-        $storedLinks = Cache::remember('PORTAL_' . $url->host, 10, function () use ($url) {
-            return DB::select('select url from results where portal = ?', [$url->host]);
+        $key = 'PORTAL_' . $url->host;
+        $storedLinks = Cache::remember($key, 1, function () use ($url) {
+            $result = DB::select('select url from results where portal = ?', [$url->host]);
+            Log::debug('Found ' . count($result) . ' stored pages for Portal: ' . $url->host);
+
+            return $result;
         });
 
-        Log::debug('Found ' . count($storedLinks) . ' stored pages for Portal ' . $url->host);
         return $storedLinks;
 
     }
@@ -115,7 +111,7 @@ class CrawlerJob extends Job implements ShouldQueue
     {
         $urls = Cache::get('PROCESSED_URLS', []);
         array_push($urls, (string) $url);
-        Cache::put('PROCESSED_URLS', $urls, 60);
+        Cache::put('PROCESSED_URLS', $urls, self::SESSION_TIMEOUT);
     }
 
     public function savePage($parser)
@@ -169,7 +165,8 @@ class CrawlerJob extends Job implements ShouldQueue
 
     public function crawlAllLinks($links)
     {
-        collect($links)
+        Log::debug('Found ' . count($links) . ' in page ' . $this->url);
+        $flteredLinks = collect($links)
             ->filter(function (Url $url) {
                 return !$url->isEmailUrl();
             })
@@ -181,9 +178,10 @@ class CrawlerJob extends Job implements ShouldQueue
             })
             ->filter(function (Url $url) {
                 return $url->host == Url::create($this->url)->host;
-            })
-            ->each(function (Url $url) {
+            });
 
+            Log::debug('Crawling ' . count($flteredLinks) . ' in page ' . $this->url);
+            $flteredLinks->each(function (Url $url) {
                 Log::debug('Creating a CrawlerJob(' . ($this->depth - 1) . ') for Url ' . $url);
                 dispatch(new CrawlerJob((string) $url, $this->depth - 1));
             });
@@ -213,7 +211,7 @@ class CrawlerJob extends Job implements ShouldQueue
         return $url->removeFragment();
     }
 
-    public function __string()
+    public function __toString()
     {
         'Crawling URL ' . $this->url;
     }
